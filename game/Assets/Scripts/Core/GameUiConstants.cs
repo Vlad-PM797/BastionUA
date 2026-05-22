@@ -14,6 +14,21 @@ namespace BastionUA.Core
         public const string HudRootName = "HUD";
         public const string CanvasName = "HudCanvas";
         public const string EventCanvasName = "EventCanvas";
+        public const string BattleCanvasName = "BattleCanvas";
+
+        public const string BattleVictoryTitle = "Victory";
+        public const string BattleDefeatTitle = "Defeat";
+        public const string BattleLabelRegion = "Region";
+        public const string BattleLabelAmmoSpent = "Ammo spent";
+        public const string BattleLabelHp = "HP (you / enemy)";
+        public const string BattleLabelRegionStatus = "Region status";
+        public const string BattleContinueButton = "Continue";
+        public const float BattlePanelWidth = 680f;
+        public const float BattlePanelHeight = 360f;
+
+        public const string LabelUnits = "Units";
+        public const string LabelUpgrades = "Upgrades";
+        public const string UpgradeMaxLabel = "MAX";
 
         public const float EventPopupDelaySeconds = 2.5f;
         public const float EventOverlayAlpha = 0.72f;
@@ -30,6 +45,7 @@ namespace BastionUA.Core
         public const string ObjectiveSecondBattle = "\u041f\u0440\u043e\u0432\u0435\u0434\u0438 \u0449\u0435 1 \u0431\u0456\u0439 \u0434\u043b\u044f \u043f\u043e\u0434\u0456\u0457 \u00ab\u0406\u0440\u043f\u0456\u043d\u044c\u00bb.";
         public const string ObjectiveIrpinPending = "\u041f\u0440\u0438\u0439\u043c\u0438 \u0440\u0456\u0448\u0435\u043d\u043d\u044f \u0443 \u043f\u043e\u0434\u0456\u0457 \u00ab\u0406\u0440\u043f\u0456\u043d\u044c\u00bb.";
         public const string ObjectiveExpandTerritory = "\u0423\u0441\u0456 \u043f\u043e\u0434\u0456\u0457 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u043e. \u041f\u043e\u0441\u0438\u043b\u044c \u0440\u0435\u0433\u0456\u043e\u043d\u0438 \u0431\u043e\u044f\u043c\u0438.";
+        public const string ObjectiveProgression = "\u041e\u0431\u0435\u0440\u0438 \u043f\u0456\u0434\u0440\u043e\u0437\u0434\u0456\u043b \u0456 \u043a\u0443\u043f\u0438 \u0430\u043f\u0433\u0440\u0435\u0439\u0434 \u0434\u043b\u044f \u0441\u0438\u043b\u044c\u043d\u0456\u0448\u0438\u0445 \u0431\u043e\u0457\u0432.";
 
         public const float ReferenceWidth = 1920f;
         public const float ReferenceHeight = 1080f;

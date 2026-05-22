@@ -27,6 +27,19 @@ namespace BastionUA.Core
     }
 
     [Serializable]
+    public sealed class UpgradeProgressState
+    {
+        public string UpgradeId;
+        public int Level;
+
+        public UpgradeProgressState(string upgradeId, int level)
+        {
+            UpgradeId = upgradeId;
+            Level = level;
+        }
+    }
+
+    [Serializable]
     public sealed class GameState
     {
         public int Ammo;
@@ -37,6 +50,8 @@ namespace BastionUA.Core
         public List<string> CompletedEventIds = new List<string>();
         public int TotalBattles;
         public bool HasSeenOnboarding;
+        public string SelectedUnitId;
+        public List<UpgradeProgressState> UpgradeLevels = new List<UpgradeProgressState>();
 
         public void Normalize()
         {
@@ -54,6 +69,61 @@ namespace BastionUA.Core
             {
                 Regions = CreateDefault().Regions;
             }
+
+            if (string.IsNullOrEmpty(SelectedUnitId) || UnitCatalog.GetById(SelectedUnitId) == null)
+            {
+                SelectedUnitId = UnitCatalog.TerritorialDefenseId;
+            }
+
+            if (UpgradeLevels == null)
+            {
+                UpgradeLevels = new List<UpgradeProgressState>();
+            }
+
+            foreach (var upgrade in UpgradeCatalog.All)
+            {
+                if (GetUpgradeLevel(upgrade.UpgradeId) < 0)
+                {
+                    SetUpgradeLevel(upgrade.UpgradeId, 0);
+                }
+            }
+        }
+
+        public int GetUpgradeLevel(string upgradeId)
+        {
+            if (UpgradeLevels == null)
+            {
+                return 0;
+            }
+
+            foreach (var entry in UpgradeLevels)
+            {
+                if (entry.UpgradeId == upgradeId)
+                {
+                    return entry.Level;
+                }
+            }
+
+            return 0;
+        }
+
+        public void SetUpgradeLevel(string upgradeId, int level)
+        {
+            if (UpgradeLevels == null)
+            {
+                UpgradeLevels = new List<UpgradeProgressState>();
+            }
+
+            for (var index = 0; index < UpgradeLevels.Count; index++)
+            {
+                if (UpgradeLevels[index].UpgradeId == upgradeId)
+                {
+                    UpgradeLevels[index].Level = level;
+                    return;
+                }
+            }
+
+            UpgradeLevels.Add(new UpgradeProgressState(upgradeId, level));
         }
 
         public bool IsEventCompleted(string eventId)
@@ -82,6 +152,7 @@ namespace BastionUA.Core
                 Morale = GameConstants.InitialMorale,
                 LastSelectedRegionId = "kyiv",
                 LastSavedUtc = DateTime.UtcNow,
+                SelectedUnitId = UnitCatalog.TerritorialDefenseId,
                 Regions = new List<RegionState>
                 {
                     new RegionState("kyiv", "Kyiv", RegionStatus.Danger),

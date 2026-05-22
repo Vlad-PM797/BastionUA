@@ -1,14 +1,14 @@
-# Bastion UA — Week 3 (CLOSED)
+# Bastion UA — Week 4 (CLOSED)
 
 Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week3_checkpoint.md`](week3_checkpoint.md)
+Checkpoint: [`docs/week4_checkpoint.md`](week4_checkpoint.md)
 
-## Week 3 Deliverables
-- [x] Event #3: Ірпінь
-- [x] Objective hint + onboarding
-- [x] Reset Save
-- [x] Windows dev build menu
-- [x] Manual QA confirmed
+## Week 4 Deliverables
+- [x] Battle result popup (victory/defeat + stats)
+- [x] 4 units with battle modifiers
+- [x] 3 ammo-driven upgrades
+- [x] HUD progression panel + objective hint
+- [x] Verification tests (modifiers + upgrade purchase)
 
-## Week 4 Entry
-See [`docs/week3_checkpoint.md`](week3_checkpoint.md) §4.
+## Week 5 Entry
+See [`docs/week4_checkpoint.md`](week4_checkpoint.md) § Next.

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BastionUA.Bootstrap;
 using BastionUA.Core;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace BastionUA.UI
         private Text _moraleText;
         private Text _selectedRegionText;
         private Text _objectiveText;
+        private readonly Dictionary<string, Image> _unitButtonBackgrounds = new Dictionary<string, Image>();
+        private readonly Dictionary<string, Text> _upgradeButtonLabels = new Dictionary<string, Text>();
 
         private void Awake()
         {
@@ -125,10 +128,52 @@ namespace BastionUA.UI
                 new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.HudTopInset));
 
             CreateTitle(legendPanel.transform, "LegendTitle", MapUiConstants.LegendTitle);
-            CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.78f);
-            CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.62f);
-            CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.46f);
-            CreateActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.12f), OnResetClicked);
+            CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.88f);
+            CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.80f);
+            CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.72f);
+            BuildProgressionPanel(legendPanel.transform);
+            CreateActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.06f), OnResetClicked);
+        }
+
+        private void BuildProgressionPanel(Transform legendPanel)
+        {
+            CreateSectionTitle(legendPanel, "UnitsTitle", GameUiConstants.LabelUnits, 0.64f);
+
+            var unitAnchors = new[] { 0.58f, 0.52f, 0.46f, 0.40f };
+            var unitIndex = 0;
+            foreach (var unit in UnitCatalog.All)
+            {
+                var anchorY = unitAnchors[unitIndex];
+                var button = CreateCompactButton(
+                    legendPanel,
+                    $"Unit_{unit.UnitId}",
+                    unit.ShortLabel,
+                    new Vector2(0.5f, anchorY),
+                    () => OnUnitClicked(unit.UnitId));
+                _unitButtonBackgrounds[unit.UnitId] = button.GetComponent<Image>();
+                unitIndex++;
+            }
+
+            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, 0.34f);
+
+            var upgradeAnchors = new[] { 0.28f, 0.22f, 0.16f };
+            var upgradeIndex = 0;
+            foreach (var upgrade in UpgradeCatalog.All)
+            {
+                var anchorY = upgradeAnchors[upgradeIndex];
+                var labelText = CreateCompactButtonLabel(legendPanel, $"Upgrade_{upgrade.UpgradeId}", anchorY);
+                _upgradeButtonLabels[upgrade.UpgradeId] = labelText;
+
+                CreateCompactButton(
+                    legendPanel,
+                    $"UpgradeBtn_{upgrade.UpgradeId}",
+                    "+",
+                    new Vector2(0.88f, anchorY),
+                    () => OnUpgradeClicked(upgrade.UpgradeId),
+                    new Vector2(44f, 32f));
+
+                upgradeIndex++;
+            }
         }
 
         private void RefreshAll()
@@ -143,6 +188,34 @@ namespace BastionUA.UI
             _objectiveText.text = $"{GameUiConstants.LabelObjective}: {_bootstrap.GetObjectiveHint()}";
 
             _regionMapView.Refresh(_bootstrap, state);
+            RefreshProgressionPanel(state);
+        }
+
+        private void RefreshProgressionPanel(GameState state)
+        {
+            foreach (var unitEntry in _unitButtonBackgrounds)
+            {
+                var isSelected = state.SelectedUnitId == unitEntry.Key;
+                unitEntry.Value.color = isSelected ? GameUiConstants.ButtonSelected : GameUiConstants.ButtonNormal;
+            }
+
+            foreach (var upgrade in UpgradeCatalog.All)
+            {
+                if (!_upgradeButtonLabels.TryGetValue(upgrade.UpgradeId, out var label))
+                {
+                    continue;
+                }
+
+                var level = state.GetUpgradeLevel(upgrade.UpgradeId);
+                if (level >= upgrade.MaxLevel)
+                {
+                    label.text = $"{upgrade.DisplayName} {GameUiConstants.UpgradeMaxLabel}";
+                    continue;
+                }
+
+                var cost = upgrade.GetCostForNextLevel(level);
+                label.text = $"{upgrade.DisplayName} L{level} ({cost})";
+            }
         }
 
         private void OnResetClicked()
@@ -163,6 +236,16 @@ namespace BastionUA.UI
         private void OnBattleClicked()
         {
             _bootstrap?.RunBattle();
+        }
+
+        private void OnUnitClicked(string unitId)
+        {
+            _bootstrap?.SelectUnit(unitId);
+        }
+
+        private void OnUpgradeClicked(string upgradeId)
+        {
+            _bootstrap?.PurchaseUpgrade(upgradeId);
         }
 
         private static void EnsureEventSystem()
@@ -259,6 +342,66 @@ namespace BastionUA.UI
             labelRect.offsetMax = new Vector2(0f, 12f);
 
             ConfigureText(labelObject.GetComponent<Text>(), label, 18, TextAnchor.MiddleLeft);
+        }
+
+        private static void CreateSectionTitle(Transform parent, string name, string content, float anchorY)
+        {
+            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
+            textObject.transform.SetParent(parent, false);
+
+            var rectTransform = textObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0.5f, anchorY);
+            rectTransform.anchorMax = new Vector2(0.5f, anchorY);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.sizeDelta = new Vector2(280f, 24f);
+
+            ConfigureText(textObject.GetComponent<Text>(), content, 18, TextAnchor.MiddleCenter);
+        }
+
+        private static Text CreateCompactButtonLabel(Transform parent, string name, float anchorY)
+        {
+            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
+            textObject.transform.SetParent(parent, false);
+
+            var rectTransform = textObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0.08f, anchorY);
+            rectTransform.anchorMax = new Vector2(0.72f, anchorY);
+            rectTransform.pivot = new Vector2(0f, 0.5f);
+            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.sizeDelta = new Vector2(200f, 32f);
+
+            return ConfigureText(textObject.GetComponent<Text>(), "--", 16, TextAnchor.MiddleLeft);
+        }
+
+        private static Button CreateCompactButton(
+            Transform parent,
+            string name,
+            string label,
+            Vector2 anchor,
+            Action onClick,
+            Vector2? size = null)
+        {
+            var buttonSize = size ?? new Vector2(260f, 32f);
+            var buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            buttonObject.transform.SetParent(parent, false);
+
+            var rectTransform = buttonObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = anchor;
+            rectTransform.anchorMax = anchor;
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.sizeDelta = buttonSize;
+
+            buttonObject.GetComponent<Image>().color = GameUiConstants.ButtonNormal;
+            var button = buttonObject.GetComponent<Button>();
+            button.onClick.AddListener(() => onClick());
+
+            var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            StretchFullScreen(labelObject.GetComponent<RectTransform>());
+            ConfigureText(labelObject.GetComponent<Text>(), label, 16, TextAnchor.MiddleCenter);
+
+            return button;
         }
 
         private static Button CreateActionButton(Transform parent, string name, string label, Vector2 anchor, Action onClick)

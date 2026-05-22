@@ -27,6 +27,8 @@ namespace BastionUA.EditorTools
                 failures += VerifyResourceLoop() ? 0 : 1;
                 failures += VerifyMapSelection() ? 0 : 1;
                 failures += VerifyBattleChangesRegionState() ? 0 : 1;
+                failures += VerifyProgressionModifiers() ? 0 : 1;
+                failures += VerifyUpgradePurchase() ? 0 : 1;
                 failures += VerifySaveLoadRoundTrip() ? 0 : 1;
                 failures += VerifyBootScenePlayModeBootstrap() ? 0 : 1;
                 failures += VerifyHudBootstrap() ? 0 : 1;
@@ -132,7 +134,7 @@ namespace BastionUA.EditorTools
             var statusBefore = region.Status;
             var moraleBefore = state.Morale;
 
-            battleService.Simulate(state, region);
+            battleService.Simulate(state, region, new BattleModifiers());
 
             if (region.Status == statusBefore && state.Morale == moraleBefore)
             {
@@ -141,6 +143,68 @@ namespace BastionUA.EditorTools
             }
 
             Debug.Log("[UnityVerification] Battle state transition OK.");
+            return true;
+        }
+
+        private static bool VerifyProgressionModifiers()
+        {
+            var progressionService = new ProgressionService();
+            var baseline = progressionService.GetBattleModifiers(GameState.CreateDefault());
+
+            var artilleryState = GameState.CreateDefault();
+            artilleryState.SelectedUnitId = UnitCatalog.ArtilleryId;
+            artilleryState.Normalize();
+            var artilleryModifiers = progressionService.GetBattleModifiers(artilleryState);
+
+            if (artilleryModifiers.PlayerDamageBonus <= baseline.PlayerDamageBonus)
+            {
+                Debug.LogError("[UnityVerification] Artillery unit should increase player damage.");
+                return false;
+            }
+
+            var upgradedState = GameState.CreateDefault();
+            upgradedState.SetUpgradeLevel(UpgradeCatalog.FireTrainingId, 2);
+            upgradedState.Normalize();
+            var upgradedModifiers = progressionService.GetBattleModifiers(upgradedState);
+
+            if (upgradedModifiers.PlayerDamageBonus <= baseline.PlayerDamageBonus)
+            {
+                Debug.LogError("[UnityVerification] Fire Training upgrade should increase player damage.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Progression modifiers OK.");
+            return true;
+        }
+
+        private static bool VerifyUpgradePurchase()
+        {
+            var state = GameState.CreateDefault();
+            state.Ammo = 120;
+            state.Normalize();
+            var progressionService = new ProgressionService();
+            var upgrade = UpgradeCatalog.GetById(UpgradeCatalog.MoraleRadioId);
+            var expectedCost = upgrade.GetCostForNextLevel(0);
+
+            if (!progressionService.TryPurchaseUpgrade(state, UpgradeCatalog.MoraleRadioId))
+            {
+                Debug.LogError("[UnityVerification] Upgrade purchase should succeed with enough ammo.");
+                return false;
+            }
+
+            if (state.GetUpgradeLevel(UpgradeCatalog.MoraleRadioId) != 1)
+            {
+                Debug.LogError("[UnityVerification] Upgrade level not incremented.");
+                return false;
+            }
+
+            if (state.Ammo != 120 - expectedCost)
+            {
+                Debug.LogError("[UnityVerification] Upgrade cost not deducted from ammo.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Upgrade purchase OK.");
             return true;
         }
 
@@ -361,9 +425,9 @@ namespace BastionUA.EditorTools
             }
 
             var hint = ObjectiveHintService.GetHint(state);
-            if (string.IsNullOrEmpty(hint))
+            if (hint != GameUiConstants.ObjectiveProgression)
             {
-                Debug.LogError("[UnityVerification] Objective hint missing after Irpin.");
+                Debug.LogError("[UnityVerification] Objective hint should switch to progression after Irpin.");
                 return false;
             }
 

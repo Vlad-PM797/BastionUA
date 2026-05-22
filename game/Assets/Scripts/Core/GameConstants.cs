@@ -15,6 +15,12 @@ namespace BastionUA.Core
         public const int BattleBaseEnemyDamage = 8;
         public const int BattleBasePlayerHp = 140;
         public const int BattleBasePlayerDamage = 10;
+        public const int BattleMaxAmmoBudget = 50;
+        public const int BattleMinAmmoBudget = 10;
+        public const int BattleVictoryMoraleGain = 5;
+        public const int BattleDefeatMoraleLoss = 3;
+        public const int BattleMaxRounds = 20;
+        public const int BattleAmmoDamageDivisor = 5;
 
         public const int MinMorale = 0;
         public const int MinAmmo = 0;

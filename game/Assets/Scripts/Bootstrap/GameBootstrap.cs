@@ -13,7 +13,9 @@ namespace BastionUA.Bootstrap
         private BattleService _battleService;
         private EventService _eventService;
         private EventTriggerService _eventTriggerService;
+        private ProgressionService _progressionService;
         private EventPopupController _eventPopupController;
+        private BattleResultPopupController _battleResultPopupController;
         private GameState _gameState;
 
         private float _autosaveAccumulator;
@@ -37,6 +39,7 @@ namespace BastionUA.Bootstrap
             _battleService = new BattleService();
             _eventService = new EventService();
             _eventTriggerService = new EventTriggerService();
+            _progressionService = new ProgressionService();
 
             _gameState = _saveService.LoadOrCreate();
             _gameState.Normalize();
@@ -145,12 +148,66 @@ namespace BastionUA.Bootstrap
                 return;
             }
 
-            _battleService.Simulate(_gameState, region);
+            var modifiers = _progressionService.GetBattleModifiers(_gameState);
+            var result = _battleService.Simulate(_gameState, region, modifiers);
             _gameState.TotalBattles++;
             MarkOnboardingSeen();
             _saveService.Save(_gameState);
             LogCurrentState();
-            TryQueueNextEvent(EventTriggerMode.OnProgress);
+            ShowBattleResult(result);
+        }
+
+        public void SelectUnit(string unitId)
+        {
+            if (_gameplayPaused)
+            {
+                return;
+            }
+
+            if (_progressionService.TrySelectUnit(_gameState, unitId))
+            {
+                _saveService.Save(_gameState);
+                LogCurrentState();
+            }
+        }
+
+        public void PurchaseUpgrade(string upgradeId)
+        {
+            if (_gameplayPaused)
+            {
+                return;
+            }
+
+            if (_progressionService.TryPurchaseUpgrade(_gameState, upgradeId))
+            {
+                _saveService.Save(_gameState);
+                LogCurrentState();
+            }
+        }
+
+        public int GetUpgradeLevel(string upgradeId)
+        {
+            return _gameState.GetUpgradeLevel(upgradeId);
+        }
+
+        private void ShowBattleResult(BattleResult result)
+        {
+            if (_battleResultPopupController == null)
+            {
+                _battleResultPopupController = FindAnyObjectByType<BattleResultPopupController>();
+            }
+
+            if (_battleResultPopupController == null)
+            {
+                Debug.LogWarning("[GameBootstrap] BattleResultPopupController not found.");
+                TryQueueNextEvent(EventTriggerMode.OnProgress);
+                return;
+            }
+
+            _battleResultPopupController.ShowBattleResult(result, () =>
+            {
+                TryQueueNextEvent(EventTriggerMode.OnProgress);
+            });
         }
 
         public void SaveNow()
@@ -224,7 +281,8 @@ namespace BastionUA.Bootstrap
         private void EnsureHud()
         {
             if (FindAnyObjectByType<HudController>() != null &&
-                FindAnyObjectByType<EventPopupController>() != null)
+                FindAnyObjectByType<EventPopupController>() != null &&
+                FindAnyObjectByType<BattleResultPopupController>() != null)
             {
                 return;
             }
@@ -246,7 +304,13 @@ namespace BastionUA.Bootstrap
                 _eventPopupController = hudRoot.AddComponent<EventPopupController>();
             }
 
-            Debug.Log("[GameBootstrap] HUD and event popup auto-created.");
+            _battleResultPopupController = hudRoot.GetComponent<BattleResultPopupController>();
+            if (_battleResultPopupController == null)
+            {
+                _battleResultPopupController = hudRoot.AddComponent<BattleResultPopupController>();
+            }
+
+            Debug.Log("[GameBootstrap] HUD, event popup, and battle popup auto-created.");
         }
 
         private void HandleDevKeyboardInput()
@@ -291,7 +355,8 @@ namespace BastionUA.Bootstrap
         {
             Debug.Log(
                 $"[GameState] Ammo={_gameState.Ammo}, Morale={_gameState.Morale}, " +
-                $"Selected={_gameState.LastSelectedRegionId}, Battles={_gameState.TotalBattles}");
+                $"Selected={_gameState.LastSelectedRegionId}, Battles={_gameState.TotalBattles}, " +
+                $"Unit={_gameState.SelectedUnitId}");
 
             foreach (var region in _gameState.Regions)
             {

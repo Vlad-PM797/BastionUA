@@ -41,7 +41,7 @@ namespace BastionUA.Services
                 return GameUiConstants.ObjectiveIrpinPending;
             }
 
-            return GameUiConstants.ObjectiveExpandTerritory;
+            return GameUiConstants.ObjectiveProgression;
         }
     }
 }
