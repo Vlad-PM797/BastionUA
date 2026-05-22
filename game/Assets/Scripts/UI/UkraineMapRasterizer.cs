@@ -1,74 +1,23 @@
 using BastionUA.Core;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace BastionUA.UI
 {
-    public static class MapSilhouetteFactory
+    public static class UkraineMapRasterizer
     {
-        public static void BuildSilhouette(Transform mapRoot)
+        public static Texture2D CreateMapTexture(int width, int height)
         {
-            var width = Mathf.RoundToInt(MapUiConstants.MapLandmassWidth * MapUiConstants.MapSilhouetteTextureScale);
-            var height = Mathf.RoundToInt(MapUiConstants.MapLandmassHeight * MapUiConstants.MapSilhouetteTextureScale);
-            var sprite = CreatePolygonSprite(
-                MapUiConstants.UkraineSilhouettePoints,
-                width,
-                height,
-                MapUiConstants.MapSilhouetteFillColor,
-                MapUiConstants.MapSilhouetteOutlineColor,
-                MapUiConstants.MapSilhouetteCoastColor,
-                MapUiConstants.MapSilhouetteBorderPixels * MapUiConstants.MapSilhouetteTextureScale,
-                MapUiConstants.MapSilhouetteEdgeSoftnessPixels * MapUiConstants.MapSilhouetteTextureScale);
-
-            var backdropObject = new GameObject("MapBackdrop", typeof(RectTransform), typeof(Image));
-            backdropObject.transform.SetParent(mapRoot, false);
-            backdropObject.transform.SetAsFirstSibling();
-            StretchFullScreen(backdropObject.GetComponent<RectTransform>(), 0f);
-            var backdropImage = backdropObject.GetComponent<Image>();
-            backdropImage.color = MapUiConstants.MapLandColor;
-            backdropImage.raycastTarget = false;
-
-            var silhouetteObject = new GameObject("UaSilhouette", typeof(RectTransform), typeof(Image));
-            silhouetteObject.transform.SetParent(mapRoot, false);
-            silhouetteObject.transform.SetSiblingIndex(1);
-
-            var silhouetteRect = silhouetteObject.GetComponent<RectTransform>();
-            StretchFullScreen(silhouetteRect, 0f);
-
-            var silhouetteImage = silhouetteObject.GetComponent<Image>();
-            silhouetteImage.sprite = sprite;
-            silhouetteImage.color = Color.white;
-            silhouetteImage.preserveAspect = false;
-            silhouetteImage.raycastTarget = false;
-
-            Debug.Log(
-                $"[MapSilhouetteFactory] Ukraine silhouette created ({MapUiConstants.UkraineSilhouettePoints.Length} border points).");
-        }
-
-        private static Sprite CreatePolygonSprite(
-            Vector2[] normalizedPoints,
-            int width,
-            int height,
-            Color fillColor,
-            Color outlineColor,
-            Color coastColor,
-            int outlinePixels,
-            float edgeSoftnessPixels)
-        {
-            var polygon = new Vector2[normalizedPoints.Length];
-            for (var index = 0; index < normalizedPoints.Length; index++)
-            {
-                polygon[index] = new Vector2(
-                    normalizedPoints[index].x * width,
-                    normalizedPoints[index].y * height);
-            }
-
+            var polygon = BuildPixelPolygon(MapUiConstants.UkraineSilhouettePoints, width, height);
             var pixels = new Color32[width * height];
             var transparent = new Color32(0, 0, 0, 0);
+
             for (var index = 0; index < pixels.Length; index++)
             {
                 pixels[index] = transparent;
             }
+
+            var outlinePixels = MapUiConstants.MapSilhouetteBorderPixels * MapUiConstants.MapSilhouetteTextureScale;
+            var edgeSoftness = MapUiConstants.MapSilhouetteEdgeSoftnessPixels * MapUiConstants.MapSilhouetteTextureScale;
 
             for (var y = 0; y < height; y++)
             {
@@ -80,14 +29,21 @@ namespace BastionUA.UI
                         continue;
                     }
 
+                    var normalizedY = y / (float)height;
+                    var fillColor = Color.Lerp(
+                        GameVisualPalette.MapFillSouth,
+                        GameVisualPalette.MapFillNorth,
+                        normalizedY);
+                    fillColor = ApplyTerrainNoise(fillColor, x, y, width, height);
+
                     var edgeDistance = GetDistanceToPolygonEdge(polygon, point);
                     pixels[(y * width) + x] = SampleSilhouetteColor(
                         fillColor,
-                        outlineColor,
-                        coastColor,
+                        GameVisualPalette.MapOutline,
+                        GameVisualPalette.MapCoast,
                         edgeDistance,
                         outlinePixels,
-                        edgeSoftnessPixels);
+                        edgeSoftness);
                 }
             }
 
@@ -96,12 +52,41 @@ namespace BastionUA.UI
             texture.wrapMode = TextureWrapMode.Clamp;
             texture.SetPixels32(pixels);
             texture.Apply();
+            return texture;
+        }
 
+        public static Sprite CreateMapSprite(int width, int height)
+        {
+            var texture = CreateMapTexture(width, height);
             return Sprite.Create(
                 texture,
                 new Rect(0f, 0f, width, height),
                 new Vector2(0.5f, 0.5f),
                 MapUiConstants.MapSilhouetteTextureScale);
+        }
+
+        private static Color ApplyTerrainNoise(Color baseColor, int x, int y, int width, int height)
+        {
+            var noise = Mathf.PerlinNoise(x * 0.018f, y * 0.018f) * 0.08f - 0.04f;
+            var latitudeShade = (y / (float)height - 0.5f) * 0.06f;
+            return new Color(
+                Mathf.Clamp01(baseColor.r + noise + latitudeShade),
+                Mathf.Clamp01(baseColor.g + noise),
+                Mathf.Clamp01(baseColor.b + noise - latitudeShade),
+                baseColor.a);
+        }
+
+        private static Vector2[] BuildPixelPolygon(Vector2[] normalizedPoints, int width, int height)
+        {
+            var polygon = new Vector2[normalizedPoints.Length];
+            for (var index = 0; index < normalizedPoints.Length; index++)
+            {
+                polygon[index] = new Vector2(
+                    normalizedPoints[index].x * width,
+                    normalizedPoints[index].y * height);
+            }
+
+            return polygon;
         }
 
         private static Color32 SampleSilhouetteColor(
@@ -171,14 +156,6 @@ namespace BastionUA.UI
             }
 
             return inside;
-        }
-
-        private static void StretchFullScreen(RectTransform rectTransform, float expandPixels)
-        {
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = new Vector2(expandPixels, expandPixels);
-            rectTransform.offsetMax = new Vector2(-expandPixels, -expandPixels);
         }
     }
 }

@@ -17,12 +17,12 @@ namespace BastionUA.Core
         public const float MapLandmassHeight = 620f;
         public const int MapLabelFontSize = 16;
 
-        public static readonly Color MapLandColor = new Color(0.06f, 0.08f, 0.11f, 0.45f);
-        public static readonly Color MapSilhouetteFillColor = new Color(0.24f, 0.46f, 0.62f, 0.96f);
-        public static readonly Color MapSilhouetteOutlineColor = new Color(0.86f, 0.94f, 1.00f, 1.00f);
-        public static readonly Color MapSilhouetteCoastColor = new Color(0.42f, 0.68f, 0.86f, 0.90f);
-        public static readonly Color MapConnectionColor = new Color(0.45f, 0.56f, 0.68f, 0.80f);
-        public static readonly Color MapSelectionRing = new Color(0.45f, 0.72f, 0.98f, 1f);
+        public static readonly Color MapLandColor = GameVisualPalette.MapBackdrop;
+        public static readonly Color MapSilhouetteFillColor = GameVisualPalette.MapFillNorth;
+        public static readonly Color MapSilhouetteOutlineColor = GameVisualPalette.MapOutline;
+        public static readonly Color MapSilhouetteCoastColor = GameVisualPalette.MapCoast;
+        public static readonly Color MapConnectionColor = GameVisualPalette.MapConnection;
+        public static readonly Color MapSelectionRing = GameVisualPalette.MapSelectionRing;
 
         public static readonly MapRegionLayout KyivLayout = UkraineMapGeometry.KyivLayout;
         public static readonly MapRegionLayout ChernihivLayout = UkraineMapGeometry.ChernihivLayout;

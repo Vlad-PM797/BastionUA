@@ -59,16 +59,18 @@ namespace BastionUA.Core
         public const float BottomBarHeight = 96f;
         public const int BaseFontSize = 22;
         public const int TitleFontSize = 26;
+        public const float AccentStripeHeight = 4f;
+        public const float SidePanelAccentWidth = 4f;
 
-        public static readonly Color PanelBackground = new Color(0.08f, 0.09f, 0.11f, 0.88f);
-        public static readonly Color TextPrimary = new Color(0.95f, 0.96f, 0.98f, 1f);
-        public static readonly Color ButtonNormal = new Color(0.18f, 0.24f, 0.34f, 1f);
-        public static readonly Color ButtonSelected = new Color(0.24f, 0.42f, 0.62f, 1f);
-        public static readonly Color StatusSafe = new Color(0.35f, 0.78f, 0.45f, 1f);
-        public static readonly Color StatusDanger = new Color(0.95f, 0.78f, 0.22f, 1f);
-        public static readonly Color StatusOccupied = new Color(0.92f, 0.32f, 0.28f, 1f);
-        public static readonly Color EventOverlay = new Color(0.02f, 0.03f, 0.06f, 0.72f);
-        public static readonly Color EventPanelBackground = new Color(0.11f, 0.13f, 0.18f, 0.96f);
-        public static readonly Color EventChoiceButton = new Color(0.22f, 0.31f, 0.45f, 1f);
+        public static Color PanelBackground => GameVisualPalette.SidePanel;
+        public static Color TextPrimary => GameVisualPalette.TextPrimary;
+        public static Color ButtonNormal => GameVisualPalette.ButtonNeutral;
+        public static Color ButtonSelected => GameVisualPalette.ButtonSelected;
+        public static Color StatusSafe => GameVisualPalette.StatusSafe;
+        public static Color StatusDanger => GameVisualPalette.StatusDanger;
+        public static Color StatusOccupied => GameVisualPalette.StatusOccupied;
+        public static Color EventOverlay => GameVisualPalette.EventOverlay;
+        public static Color EventPanelBackground => GameVisualPalette.EventPanel;
+        public static Color EventChoiceButton => GameVisualPalette.EventChoice;
     }
 }

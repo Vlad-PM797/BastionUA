@@ -9,21 +9,19 @@ namespace BastionUA.UI
 {
     public sealed class RegionMapView
     {
-        private readonly Transform _mapRoot;
         private readonly Action<string> _onRegionSelected;
         private readonly Dictionary<string, MapMarkerUi> _markers = new Dictionary<string, MapMarkerUi>();
 
         public RegionMapView(Transform parent, Action<string> onRegionSelected)
         {
             _onRegionSelected = onRegionSelected;
-            var landmassTransform = BuildMapPanel(parent);
-            _mapRoot = landmassTransform;
-            BuildSilhouette(_mapRoot);
-            BuildConnections(_mapRoot);
+            var mapRoot = BuildMapPanel(parent);
+            MapArtLoader.BuildMapArt(mapRoot);
+            BuildConnections(mapRoot);
 
             foreach (var region in RegionCatalog.All)
             {
-                BuildMarker(_mapRoot, region.Layout);
+                BuildMarker(mapRoot, region.Layout);
             }
         }
 
@@ -49,9 +47,21 @@ namespace BastionUA.UI
                 new Vector2(0f, 0f),
                 new Vector2(1f, 1f),
                 new Vector2(GameUiConstants.SidePanelWidth, GameUiConstants.BottomBarHeight),
-                new Vector2(-24f, -GameUiConstants.HudTopInset));
+                new Vector2(-24f, -GameUiConstants.HudTopInset),
+                GameVisualPalette.SidePanel);
 
             CreateTitle(mapPanel.transform, "MapTitle", MapUiConstants.MapPanelTitle);
+
+            var frameObject = new GameObject("MapFrame", typeof(RectTransform), typeof(Image));
+            frameObject.transform.SetParent(mapPanel.transform, false);
+            var frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.anchorMin = new Vector2(0.5f, 0.5f);
+            frameRect.anchorMax = new Vector2(0.5f, 0.5f);
+            frameRect.pivot = new Vector2(0.5f, 0.5f);
+            frameRect.sizeDelta = new Vector2(
+                MapUiConstants.MapLandmassWidth + 12f,
+                MapUiConstants.MapLandmassHeight + 12f);
+            frameObject.GetComponent<Image>().color = GameVisualPalette.MapFrame;
 
             var landmass = new GameObject("MapLandmass", typeof(RectTransform));
             landmass.transform.SetParent(mapPanel.transform, false);
@@ -64,11 +74,6 @@ namespace BastionUA.UI
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(landRect);
             return landmass.transform;
-        }
-
-        private static void BuildSilhouette(Transform mapRoot)
-        {
-            MapSilhouetteFactory.BuildSilhouette(mapRoot);
         }
 
         private static void BuildConnections(Transform mapRoot)
@@ -92,7 +97,7 @@ namespace BastionUA.UI
             rectTransform.sizeDelta = new Vector2(MapUiConstants.MapMarkerSize, MapUiConstants.MapMarkerSize);
 
             var buttonImage = markerObject.GetComponent<Image>();
-            buttonImage.color = GameUiConstants.ButtonNormal;
+            buttonImage.color = GameVisualPalette.ButtonNeutralBorder;
 
             var button = markerObject.GetComponent<Button>();
             var regionId = layout.RegionId;
@@ -101,17 +106,21 @@ namespace BastionUA.UI
             var ringObject = new GameObject("StatusRing", typeof(RectTransform), typeof(Image));
             ringObject.transform.SetParent(markerObject.transform, false);
             var ringRect = ringObject.GetComponent<RectTransform>();
-            StretchFullScreen(ringRect, -MapUiConstants.MapMarkerRingThickness);
-
+            StretchFullScreen(ringRect, -4f);
             var ringImage = ringObject.GetComponent<Image>();
-            ringImage.color = GameUiConstants.StatusDanger;
+            ringImage.color = GameVisualPalette.StatusDanger;
+
+            var coreObject = new GameObject("Core", typeof(RectTransform), typeof(Image));
+            coreObject.transform.SetParent(markerObject.transform, false);
+            var coreRect = coreObject.GetComponent<RectTransform>();
+            StretchFullScreen(coreRect, -MapUiConstants.MapMarkerRingThickness);
+            coreObject.GetComponent<Image>().color = GameVisualPalette.MapMarkerCore;
 
             var selectionObject = new GameObject("SelectionRing", typeof(RectTransform), typeof(Image));
             selectionObject.transform.SetParent(markerObject.transform, false);
             var selectionRect = selectionObject.GetComponent<RectTransform>();
-            StretchFullScreen(selectionRect, -MapUiConstants.MapMarkerRingThickness * 2.2f);
-            var selectionImage = selectionObject.GetComponent<Image>();
-            selectionImage.color = MapUiConstants.MapSelectionRing;
+            StretchFullScreen(selectionRect, -MapUiConstants.MapMarkerRingThickness * 2.4f);
+            selectionObject.GetComponent<Image>().color = GameVisualPalette.MapSelectionRing;
             selectionObject.SetActive(false);
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -120,7 +129,7 @@ namespace BastionUA.UI
             labelRect.anchorMin = new Vector2(0.5f, 0f);
             labelRect.anchorMax = new Vector2(0.5f, 0f);
             labelRect.pivot = new Vector2(0.5f, 1f);
-            labelRect.anchoredPosition = new Vector2(0f, -MapUiConstants.MapMarkerSize * 0.55f);
+            labelRect.anchoredPosition = new Vector2(0f, -MapUiConstants.MapMarkerSize * 0.58f);
             labelRect.sizeDelta = new Vector2(160f, 28f);
 
             var labelText = labelObject.GetComponent<Text>();
@@ -129,7 +138,8 @@ namespace BastionUA.UI
                 labelText,
                 definition != null ? definition.DisplayName : layout.RegionId,
                 MapUiConstants.MapLabelFontSize,
-                TextAnchor.UpperCenter);
+                TextAnchor.UpperCenter,
+                GameVisualPalette.TextPrimary);
 
             _markers[layout.RegionId] = new MapMarkerUi(buttonImage, ringImage, selectionObject, labelText);
         }
@@ -164,7 +174,8 @@ namespace BastionUA.UI
             Vector2 anchorMin,
             Vector2 anchorMax,
             Vector2 offsetMin,
-            Vector2 offsetMax)
+            Vector2 offsetMax,
+            Color backgroundColor)
         {
             var panelObject = new GameObject(name, typeof(RectTransform), typeof(Image));
             panelObject.transform.SetParent(parent, false);
@@ -174,7 +185,7 @@ namespace BastionUA.UI
             rectTransform.anchorMax = anchorMax;
             rectTransform.offsetMin = offsetMin;
             rectTransform.offsetMax = offsetMax;
-            panelObject.GetComponent<Image>().color = GameUiConstants.PanelBackground;
+            panelObject.GetComponent<Image>().color = backgroundColor;
 
             return panelObject;
         }
@@ -191,7 +202,12 @@ namespace BastionUA.UI
             rectTransform.anchoredPosition = new Vector2(0f, -12f);
             rectTransform.sizeDelta = new Vector2(420f, 40f);
 
-            ConfigureText(textObject.GetComponent<Text>(), content, GameUiConstants.TitleFontSize, TextAnchor.MiddleCenter);
+            ConfigureText(
+                textObject.GetComponent<Text>(),
+                content,
+                GameUiConstants.TitleFontSize,
+                TextAnchor.MiddleCenter,
+                GameVisualPalette.TextAccent);
         }
 
         private static void StretchFullScreen(RectTransform rectTransform, float expandPixels)
@@ -202,12 +218,12 @@ namespace BastionUA.UI
             rectTransform.offsetMax = new Vector2(-expandPixels, -expandPixels);
         }
 
-        private static void ConfigureText(Text text, string content, int fontSize, TextAnchor alignment)
+        private static void ConfigureText(Text text, string content, int fontSize, TextAnchor alignment, Color color)
         {
             text.text = content;
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = fontSize;
-            text.color = GameUiConstants.TextPrimary;
+            text.color = color;
             text.alignment = alignment;
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.verticalOverflow = VerticalWrapMode.Overflow;
@@ -232,7 +248,9 @@ namespace BastionUA.UI
             {
                 _label.text = region.DisplayName;
                 _statusRing.color = GetStatusColor(region.Status);
-                _buttonImage.color = isSelected ? GameUiConstants.ButtonSelected : GameUiConstants.ButtonNormal;
+                _buttonImage.color = isSelected
+                    ? GameVisualPalette.ButtonSelectedBorder
+                    : GameVisualPalette.ButtonNeutralBorder;
                 _selectionRing.SetActive(isSelected);
             }
 
@@ -241,13 +259,13 @@ namespace BastionUA.UI
                 switch (status)
                 {
                     case RegionStatus.Safe:
-                        return GameUiConstants.StatusSafe;
+                        return GameVisualPalette.StatusSafe;
                     case RegionStatus.Danger:
-                        return GameUiConstants.StatusDanger;
+                        return GameVisualPalette.StatusDanger;
                     case RegionStatus.Occupied:
-                        return GameUiConstants.StatusOccupied;
+                        return GameVisualPalette.StatusOccupied;
                     default:
-                        return GameUiConstants.TextPrimary;
+                        return GameVisualPalette.TextPrimary;
                 }
             }
         }

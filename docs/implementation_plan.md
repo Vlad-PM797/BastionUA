@@ -1,13 +1,13 @@
-# Bastion UA — Week 6 (CLOSED)
+# Bastion UA — Week 7 (CLOSED)
 
 Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week6_checkpoint.md`](week6_checkpoint.md)
+Checkpoint: [`docs/week7_checkpoint.md`](week7_checkpoint.md)
 
-## Week 6 Deliverables
-- [x] Accurate UA map silhouette with Crimea
-- [x] Event #4: Kharkiv
-- [x] Objective hints updated
-- [x] Verification test for Kharkiv event
+## Week 7 Deliverables
+- [x] `GameVisualPalette` — UA-themed color system
+- [x] PNG map asset + runtime loader + editor baker
+- [x] HUD reskin (panels, accents, primary Battle button)
+- [x] Map frame + pin markers
 
-## Week 7 Entry
-See [`docs/week6_checkpoint.md`](week6_checkpoint.md) § Next.
+## Week 8 Entry
+See [`docs/week7_checkpoint.md`](week7_checkpoint.md) § Next.
