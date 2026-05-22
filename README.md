@@ -23,9 +23,10 @@
 | 03 | [Pitch Deck](./docs/03_pitch_deck.md) | 15 слайдів для інвесторів + додатки |
 | 04 | [Unit Economics](./docs/04_unit_economics.md) | ARPU/LTV/CAC/3-річний P&L, сценарії |
 | 05 | [Legal](./docs/05_legal.md) | Юр-структура, ліцензії бригад, App Store compliance |
-| — | [Week 1 Checkpoint](./docs/week1_checkpoint.md) | ✅ Прототип Unity: core loop, HUD, Hostomel event |
+| — | [Week 1 Checkpoint](./docs/week1_checkpoint.md) | ✅ Core loop, HUD, Hostomel |
+| — | [Week 2 Checkpoint](./docs/week2_checkpoint.md) | ✅ Events pipeline, map HUD, Chornobaivka |
 
-### Unity prototype (Week 1 ✅)
+### Unity prototype (Week 2 ✅)
 - Проєкт: [`game/`](./game/) — Unity 6000.4.4f1
 - Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
 

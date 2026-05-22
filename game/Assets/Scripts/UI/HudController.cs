@@ -9,15 +9,10 @@ namespace BastionUA.UI
     public sealed class HudController : MonoBehaviour
     {
         private GameBootstrap _bootstrap;
+        private RegionMapView _regionMapView;
         private Text _ammoText;
         private Text _moraleText;
         private Text _selectedRegionText;
-        private Text _kyivStatusText;
-        private Text _chernihivStatusText;
-        private Text _sumyStatusText;
-        private Button _kyivButton;
-        private Button _chernihivButton;
-        private Button _sumyButton;
 
         private void Awake()
         {
@@ -76,25 +71,19 @@ namespace BastionUA.UI
 
             EnsureEventSystem();
 
-            var topBar = CreatePanel(canvasObject.transform, "TopBar", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -GameUiConstants.TopBarHeight), Vector2.zero);
+            var topBar = CreatePanel(
+                canvasObject.transform,
+                "TopBar",
+                new Vector2(0f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(0f, -GameUiConstants.TopBarHeight),
+                Vector2.zero);
             _ammoText = CreateStatText(topBar.transform, "AmmoText", new Vector2(0.02f, 0.5f), $"{GameUiConstants.LabelAmmo}: --");
             _moraleText = CreateStatText(topBar.transform, "MoraleText", new Vector2(0.34f, 0.5f), $"{GameUiConstants.LabelMorale}: --");
             _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.66f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
 
-            var sidePanel = CreatePanel(
-                canvasObject.transform,
-                "RegionPanel",
-                new Vector2(0f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(0f, GameUiConstants.BottomBarHeight),
-                new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.TopBarHeight));
-            CreateTitle(sidePanel.transform, "RegionsTitle", "Regions");
-            _kyivButton = CreateRegionButton(sidePanel.transform, "KyivButton", "Kyiv", new Vector2(0.5f, 0.78f), OnKyivClicked);
-            _kyivStatusText = CreateRegionStatusText(_kyivButton.transform, "KyivStatus");
-            _chernihivButton = CreateRegionButton(sidePanel.transform, "ChernihivButton", "Chernihiv", new Vector2(0.5f, 0.52f), OnChernihivClicked);
-            _chernihivStatusText = CreateRegionStatusText(_chernihivButton.transform, "ChernihivStatus");
-            _sumyButton = CreateRegionButton(sidePanel.transform, "SumyButton", "Sumy", new Vector2(0.5f, 0.26f), OnSumyClicked);
-            _sumyStatusText = CreateRegionStatusText(_sumyButton.transform, "SumyStatus");
+            BuildLegendPanel(canvasObject.transform);
+            _regionMapView = new RegionMapView(canvasObject.transform, OnRegionSelected);
 
             var bottomBar = CreatePanel(
                 canvasObject.transform,
@@ -106,7 +95,23 @@ namespace BastionUA.UI
             CreateActionButton(bottomBar.transform, "TapButton", GameUiConstants.ButtonTap, new Vector2(0.2f, 0.5f), OnTapClicked);
             CreateActionButton(bottomBar.transform, "BattleButton", GameUiConstants.ButtonBattle, new Vector2(0.62f, 0.5f), OnBattleClicked);
 
-            Debug.Log("[HudController] HUD built.");
+            Debug.Log("[HudController] HUD with map built.");
+        }
+
+        private void BuildLegendPanel(Transform canvasTransform)
+        {
+            var legendPanel = CreatePanel(
+                canvasTransform,
+                "LegendPanel",
+                new Vector2(0f, 0f),
+                new Vector2(0f, 1f),
+                new Vector2(0f, GameUiConstants.BottomBarHeight),
+                new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.TopBarHeight));
+
+            CreateTitle(legendPanel.transform, "LegendTitle", MapUiConstants.LegendTitle);
+            CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.78f);
+            CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.62f);
+            CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.46f);
         }
 
         private void RefreshAll()
@@ -119,63 +124,17 @@ namespace BastionUA.UI
             var selectedLabel = selectedRegion != null ? selectedRegion.DisplayName : state.LastSelectedRegionId;
             _selectedRegionText.text = $"{GameUiConstants.LabelSelectedRegion}: {selectedLabel}";
 
-            UpdateRegionEntry("kyiv", _kyivButton, _kyivStatusText, state);
-            UpdateRegionEntry("chernihiv", _chernihivButton, _chernihivStatusText, state);
-            UpdateRegionEntry("sumy", _sumyButton, _sumyStatusText, state);
+            _regionMapView.Refresh(_bootstrap, state);
         }
 
-        private void UpdateRegionEntry(string regionId, Button button, Text statusText, GameState state)
+        private void OnRegionSelected(string regionId)
         {
-            var region = _bootstrap.GetRegion(regionId);
-            if (region == null)
-            {
-                statusText.text = "--";
-                return;
-            }
-
-            statusText.text = region.Status.ToString();
-            statusText.color = GetStatusColor(region.Status);
-
-            var colors = button.colors;
-            var isSelected = state.LastSelectedRegionId == regionId;
-            colors.normalColor = isSelected ? GameUiConstants.ButtonSelected : GameUiConstants.ButtonNormal;
-            colors.highlightedColor = isSelected ? GameUiConstants.ButtonSelected : GameUiConstants.ButtonNormal * 1.08f;
-            button.colors = colors;
-        }
-
-        private static Color GetStatusColor(RegionStatus status)
-        {
-            switch (status)
-            {
-                case RegionStatus.Safe:
-                    return GameUiConstants.StatusSafe;
-                case RegionStatus.Danger:
-                    return GameUiConstants.StatusDanger;
-                case RegionStatus.Occupied:
-                    return GameUiConstants.StatusOccupied;
-                default:
-                    return GameUiConstants.TextPrimary;
-            }
+            _bootstrap?.SelectRegion(regionId);
         }
 
         private void OnTapClicked()
         {
             _bootstrap?.ManualTap();
-        }
-
-        private void OnKyivClicked()
-        {
-            _bootstrap?.SelectRegion("kyiv");
-        }
-
-        private void OnChernihivClicked()
-        {
-            _bootstrap?.SelectRegion("chernihiv");
-        }
-
-        private void OnSumyClicked()
-        {
-            _bootstrap?.SelectRegion("sumy");
         }
 
         private void OnBattleClicked()
@@ -190,11 +149,20 @@ namespace BastionUA.UI
                 return;
             }
 
-            var eventSystemObject = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.EventSystems.StandaloneInputModule));
+            var eventSystemObject = new GameObject(
+                "EventSystem",
+                typeof(UnityEngine.EventSystems.EventSystem),
+                typeof(UnityEngine.EventSystems.StandaloneInputModule));
             DontDestroyOnLoad(eventSystemObject);
         }
 
-        private static GameObject CreatePanel(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        private static GameObject CreatePanel(
+            Transform parent,
+            string name,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            Vector2 offsetMin,
+            Vector2 offsetMax)
         {
             var panelObject = new GameObject(name, typeof(RectTransform), typeof(Image));
             panelObject.transform.SetParent(parent, false);
@@ -204,9 +172,7 @@ namespace BastionUA.UI
             rectTransform.anchorMax = anchorMax;
             rectTransform.offsetMin = offsetMin;
             rectTransform.offsetMax = offsetMax;
-
-            var image = panelObject.GetComponent<Image>();
-            image.color = GameUiConstants.PanelBackground;
+            panelObject.GetComponent<Image>().color = GameUiConstants.PanelBackground;
 
             return panelObject;
         }
@@ -241,55 +207,35 @@ namespace BastionUA.UI
             ConfigureText(textObject.GetComponent<Text>(), content, GameUiConstants.TitleFontSize, TextAnchor.MiddleCenter);
         }
 
-        private static Button CreateRegionButton(Transform parent, string name, string label, Vector2 anchor, Action onClick)
+        private static void CreateLegendEntry(Transform parent, string name, string label, Color color, float anchorY)
         {
-            var buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-            buttonObject.transform.SetParent(parent, false);
+            var rowObject = new GameObject(name, typeof(RectTransform));
+            rowObject.transform.SetParent(parent, false);
 
-            var rectTransform = buttonObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = anchor;
-            rectTransform.anchorMax = anchor;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(280f, 72f);
+            var rowRect = rowObject.GetComponent<RectTransform>();
+            rowRect.anchorMin = new Vector2(0.5f, anchorY);
+            rowRect.anchorMax = new Vector2(0.5f, anchorY);
+            rowRect.pivot = new Vector2(0.5f, 0.5f);
+            rowRect.sizeDelta = new Vector2(260f, 28f);
 
-            var image = buttonObject.GetComponent<Image>();
-            image.color = GameUiConstants.ButtonNormal;
-
-            var button = buttonObject.GetComponent<Button>();
-            var colors = button.colors;
-            colors.normalColor = GameUiConstants.ButtonNormal;
-            colors.highlightedColor = GameUiConstants.ButtonNormal * 1.08f;
-            colors.pressedColor = GameUiConstants.ButtonNormal * 0.92f;
-            button.colors = colors;
-            button.onClick.AddListener(() => onClick());
+            var swatchObject = new GameObject("Swatch", typeof(RectTransform), typeof(Image));
+            swatchObject.transform.SetParent(rowObject.transform, false);
+            var swatchRect = swatchObject.GetComponent<RectTransform>();
+            swatchRect.anchorMin = new Vector2(0f, 0.5f);
+            swatchRect.anchorMax = new Vector2(0f, 0.5f);
+            swatchRect.pivot = new Vector2(0f, 0.5f);
+            swatchRect.sizeDelta = new Vector2(18f, 18f);
+            swatchObject.GetComponent<Image>().color = color;
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
-            labelObject.transform.SetParent(buttonObject.transform, false);
-
+            labelObject.transform.SetParent(rowObject.transform, false);
             var labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(12f, 24f);
-            labelRect.offsetMax = new Vector2(-12f, -8f);
+            labelRect.anchorMin = new Vector2(0f, 0.5f);
+            labelRect.anchorMax = new Vector2(1f, 0.5f);
+            labelRect.offsetMin = new Vector2(28f, -12f);
+            labelRect.offsetMax = new Vector2(0f, 12f);
 
-            ConfigureText(labelObject.GetComponent<Text>(), label, GameUiConstants.BaseFontSize, TextAnchor.UpperCenter);
-
-            return button;
-        }
-
-        private static Text CreateRegionStatusText(Transform parent, string name)
-        {
-            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
-            textObject.transform.SetParent(parent, false);
-
-            var rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0f, 0f);
-            rectTransform.anchorMax = new Vector2(1f, 0f);
-            rectTransform.pivot = new Vector2(0.5f, 0f);
-            rectTransform.anchoredPosition = new Vector2(0f, 6f);
-            rectTransform.sizeDelta = new Vector2(-16f, 22f);
-
-            return ConfigureText(textObject.GetComponent<Text>(), "--", 18, TextAnchor.LowerCenter);
+            ConfigureText(labelObject.GetComponent<Text>(), label, 18, TextAnchor.MiddleLeft);
         }
 
         private static Button CreateActionButton(Transform parent, string name, string label, Vector2 anchor, Action onClick)
@@ -303,24 +249,24 @@ namespace BastionUA.UI
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
             rectTransform.sizeDelta = new Vector2(280f, 56f);
 
-            var image = buttonObject.GetComponent<Image>();
-            image.color = GameUiConstants.ButtonNormal;
-
+            buttonObject.GetComponent<Image>().color = GameUiConstants.ButtonNormal;
             var button = buttonObject.GetComponent<Button>();
             button.onClick.AddListener(() => onClick());
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
             labelObject.transform.SetParent(buttonObject.transform, false);
-
-            var labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = Vector2.zero;
-            labelRect.offsetMax = Vector2.zero;
-
+            StretchFullScreen(labelObject.GetComponent<RectTransform>());
             ConfigureText(labelObject.GetComponent<Text>(), label, GameUiConstants.BaseFontSize, TextAnchor.MiddleCenter);
 
             return button;
+        }
+
+        private static void StretchFullScreen(RectTransform rectTransform)
+        {
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
         }
 
         private static Text ConfigureText(Text text, string content, int fontSize, TextAnchor alignment)
