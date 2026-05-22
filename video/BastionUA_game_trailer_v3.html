@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bastion UA — Game Trailer Concept</title>
+  <style>
+    :root {
+      --bg: #07101d;
+      --panel: #0f1b2f;
+      --panel-2: #13223a;
+      --text: #f4f7ff;
+      --muted: #98a7c4;
+      --accent: #ffd54f;
+      --safe: #38a169;
+      --danger: #f4b400;
+      --occupied: #db4437;
+      --line: #28415f;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top, #13223a 0%, var(--bg) 55%, #040b14 100%);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 36px 48px 32px;
+    }
+
+    .topbar, .bottombar {
+      position: absolute;
+      left: 48px;
+      right: 48px;
+      border-top: 1px solid var(--line);
+      opacity: .65;
+    }
+
+    .topbar { top: 24px; }
+    .bottombar { bottom: 24px; }
+
+    .brand {
+      position: absolute;
+      top: 44px;
+      left: 48px;
+      font-size: 14px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .timer {
+      position: absolute;
+      top: 44px;
+      right: 48px;
+      font-size: 14px;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 92px 48px 70px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 32px;
+      opacity: 0;
+      transform: translateY(20px) scale(.985);
+      transition: opacity .8s ease, transform .8s ease;
+      pointer-events: none;
+    }
+
+    .scene.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .left, .right {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: 58px;
+      line-height: 1.02;
+      max-width: 720px;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 24px;
+      line-height: 1.35;
+      max-width: 720px;
+    }
+
+    .vo {
+      margin-top: 24px;
+      max-width: 720px;
+      padding: 18px 20px;
+      background: rgba(15, 27, 47, 0.82);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px;
+      color: var(--text);
+      font-size: 22px;
+      line-height: 1.45;
+      box-shadow: 0 18px 50px rgba(0,0,0,.24);
+    }
+
+    .mock {
+      background: linear-gradient(180deg, rgba(19,34,58,.95) 0%, rgba(10,18,32,.98) 100%);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 28px;
+      min-height: 620px;
+      padding: 24px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .map {
+      height: 470px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #11233a 0%, #0c1828 100%);
+      border: 1px solid rgba(255,255,255,.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-shape {
+      position: absolute;
+      left: 14%;
+      top: 15%;
+      width: 68%;
+      height: 68%;
+      background: linear-gradient(180deg, #18324f 0%, #11243a 100%);
+      clip-path: polygon(16% 20%, 34% 8%, 58% 10%, 81% 22%, 74% 48%, 84% 76%, 60% 88%, 35% 84%, 20% 67%, 14% 46%);
+      opacity: .95;
+    }
+
+    .node {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 12px rgba(255,255,255,.03);
+      animation: pulse 1.8s infinite ease-in-out;
+    }
+
+    .node.safe { background: var(--safe); }
+    .node.danger { background: var(--danger); }
+    .node.occupied { background: var(--occupied); }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: .9; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    .label {
+      position: absolute;
+      color: var(--text);
+      font-size: 14px;
+      padding: 6px 10px;
+      background: rgba(7, 16, 29, .72);
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 12px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 20px;
+      padding: 18px;
+      min-height: 150px;
+    }
+
+    .card.active {
+      border-color: rgba(255, 213, 79, .55);
+      box-shadow: 0 0 0 1px rgba(255,213,79,.15) inset;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .perk {
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      margin-top: 14px;
+    }
+
+    .bar .name {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .track {
+      width: 100%;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s ease;
+    }
+
+    .fill.enemy { background: var(--occupied); }
+    .fill.ally { background: var(--safe); }
+
+    .event-box, .upgrade-box, .prestige-box {
+      margin-top: 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 22px;
+      padding: 22px;
+    }
+
+    .choice {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .choice.active {
+      border-color: rgba(255, 213, 79, .55);
+      color: var(--text);
+    }
+
+    .timeline {
+      position: absolute;
+      left: 48px;
+      right: 48px;
+      bottom: 36px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    .timeline > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd54f 0%, #fff2b0 100%);
+      transition: width .2s linear;
+    }
+
+    .scene-tag {
+      position: absolute;
+      left: 48px;
+      bottom: 50px;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar"></div>
+    <div class="bottombar"></div>
+    <div class="brand">Bastion UA / Trailer Concept v3</div>
+    <div class="timer" id="timer">00:00 / 02:00</div>
+    <div class="scene-tag" id="sceneTag">Scene 1</div>
+    <div class="timeline"><div id="progress"></div></div>
+
+    <section class="scene active" data-duration="12">
+      <div class="left">
+        <div class="eyebrow">Scene 1</div>
+        <h1>Кампанія починається з карти.</h1>
+        <p class="subtitle">Напруга вже тут. Ти ще нічого не натиснув, але вже відчуваєш, що часу замало.</p>
+        <div class="vo">Є події, які не можна просто перегорнути. І є кампанії, у які входиш одразу з відчуттям напруги.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="map">
+            <div class="map-shape"></div>
+            <div class="node danger" style="left:48%;top:38%;"></div>
+            <div class="node danger" style="left:66%;top:30%;"></div>
+            <div class="node occupied" style="left:70%;top:56%;"></div>
+            <div class="label" style="left:46%;top:46%;">Kyiv</div>
+            <div class="label" style="left:63%;top:38%;">Chernihiv</div>
+            <div class="label" style="left:67%;top:64%;">Sumy</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="14">
+      <div class="left">
+        <div class="eyebrow">Scene 2</div>
+        <h1>Три регіони. Один фронт.</h1>
+        <p class="subtitle">Київ, Чернігів, Суми. Кожен регіон живе у своєму темпі загрози.</p>
+        <div class="vo">Ти не просто дивишся на кампанію. Ти бачиш, де вона хитається, і обираєш, куди вкласти першу увагу.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="hud">
+            <div class="chip">💰 Ammo 120</div>
+            <div class="chip">🛡 Morale 72</div>
+            <div class="chip">🎖 Campaign: Kyiv 2022</div>
+          </div>
+          <div class="map">
+            <div class="map-shape"></div>
+            <div class="node safe" style="left:48%;top:38%;"></div>
+            <div class="node danger" style="left:66%;top:30%;"></div>
+            <div class="node occupied" style="left:70%;top:56%;"></div>
+            <div class="label" style="left:46%;top:46%;">Kyiv / Stable</div>
+            <div class="label" style="left:63%;top:38%;">Chernihiv / Threat</div>
+            <div class="label" style="left:67%;top:64%;">Sumy / Pressure</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="14">
+      <div class="left">
+        <div class="eyebrow">Scene 3</div>
+        <h1>Ресурсний цикл запускається відразу.</h1>
+        <p class="subtitle">Тап, автогенерація, короткий ритм — усе працює на підготовку до першого бою.</p>
+        <div class="vo">Сесія коротка, але темп відчувається з перших секунд. Ти збираєш ресурс і вже думаєш, на що його витратити.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="hud">
+            <div class="chip">💰 Ammo 248</div>
+            <div class="chip">🛠 Auto +4/sec</div>
+            <div class="chip">👆 Tap +12</div>
+          </div>
+          <div class="event-box">
+            <h3 style="margin:0 0 8px;font-size:32px;">Набої ростуть</h3>
+            <p style="margin:0 0 16px;color:var(--muted);font-size:20px;">Перший цикл готує тебе до першого бою.</p>
+            <div class="choice active">+12 вручну</div>
+            <div class="choice">+4 щосекунди</div>
+            <div class="choice">Мета: підготувати сектор до захисту</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="18">
+      <div class="left">
+        <div class="eyebrow">Scene 4</div>
+        <h1>Підрозділи визначають стиль проходження.</h1>
+        <p class="subtitle">Не просто цифри. Оборона, штурм, розвідка — різні рішення для однієї кампанії.</p>
+        <div class="vo">Тут важлива не лише сила. Важлива роль. Кого ти ставиш у сектор, такою і буде твоя тактика.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="cards">
+            <div class="card">
+              <h3>Vanguard</h3>
+              <div class="perk">DEF +15%</div>
+              <div style="color:var(--muted);">Втримує лінію й переживає затяжний тиск.</div>
+            </div>
+            <div class="card active">
+              <h3>Falcons</h3>
+              <div class="perk">ATK +12%</div>
+              <div style="color:var(--muted);">Дає сильніший темп у короткому бою.</div>
+            </div>
+            <div class="card">
+              <h3>Recon</h3>
+              <div class="perk">CRIT +10%</div>
+              <div style="color:var(--muted);">Працює від точності й підготовки.</div>
+            </div>
+          </div>
+          <div class="event-box" style="margin-top:18px;">
+            <div style="font-size:20px;color:var(--muted);margin-bottom:8px;">Battle Slot</div>
+            <div class="choice active">Falcons → Northern Sector</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="20">
+      <div class="left">
+        <div class="eyebrow">Scene 5</div>
+        <h1>Перший бій дає швидкий і зрозумілий результат.</h1>
+        <p class="subtitle">Ресурс витрачається, напруга росте, а карта відразу відповідає на твої дії.</p>
+        <div class="vo">Бій короткий, але не порожній. Ти запускаєш сектор, бачиш хід сутички і відразу повертаєш результат на карту.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="bar">
+            <div class="name">Enemy</div>
+            <div class="track"><div class="fill enemy" style="width:24%;"></div></div>
+          </div>
+          <div class="bar">
+            <div class="name">Allies</div>
+            <div class="track"><div class="fill ally" style="width:68%;"></div></div>
+          </div>
+          <div class="cards" style="margin-top:28px;grid-template-columns:repeat(3,1fr);">
+            <div class="card"><h3>Vanguard</h3><div class="perk">Frontline</div></div>
+            <div class="card active"><h3>Falcons</h3><div class="perk">Assault</div></div>
+            <div class="card"><h3>Recon</h3><div class="perk">Support</div></div>
+          </div>
+          <div class="event-box" style="margin-top:18px;">
+            <div style="font-size:32px;margin-bottom:10px;">Сектор втримано</div>
+            <div style="color:var(--accent);font-size:20px;">Status: Danger → Safe</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="17">
+      <div class="left">
+        <div class="eyebrow">Scene 6</div>
+        <h1>Подія змушує обирати.</h1>
+        <p class="subtitle">Не декоративний текст, а рішення, яке змінює ресурс, morale або хід кампанії.</p>
+        <div class="vo">Події додають грі характер. Тут доводиться не просто клікати далі, а вирішувати, чим ризикнути і що зберегти.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="event-box">
+            <div style="color:var(--accent);font-size:15px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">28.02.2022</div>
+            <div style="font-size:34px;margin-bottom:12px;">Аеродром під тиском</div>
+            <div style="color:var(--muted);font-size:20px;line-height:1.5;">Ворожий тиск зростає. Як ти стабілізуєш сектор?</div>
+            <div class="choice">Відправити резерв</div>
+            <div class="choice active">Знищити злітну смугу</div>
+            <div class="choice">Зекономити набій</div>
+            <div style="margin-top:18px;color:var(--accent);font-size:18px;">Outcome: Morale +8, Kyiv line stabilizes</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="14">
+      <div class="left">
+        <div class="eyebrow">Scene 7</div>
+        <h1>Апгрейд змінює темп гри.</h1>
+        <p class="subtitle">Один вузол — і весь цикл уже відчувається інакше.</p>
+        <div class="vo">Прогрес тут не декоративний. Після апгрейду ти буквально граєш у швидшу, зібранішу версію кампанії.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="upgrade-box">
+            <div style="font-size:34px;margin-bottom:16px;">Tech Tree</div>
+            <div style="display:flex;align-items:center;gap:22px;margin:24px 0 18px;">
+              <div style="width:72px;height:72px;border-radius:50%;background:var(--safe);"></div>
+              <div style="height:6px;width:120px;background:var(--line);"></div>
+              <div style="width:72px;height:72px;border-radius:50%;background:var(--safe);"></div>
+              <div style="height:6px;width:120px;background:var(--line);"></div>
+              <div style="width:72px;height:72px;border-radius:50%;background:var(--accent);"></div>
+            </div>
+            <div style="font-size:24px;color:var(--accent);margin-bottom:8px;">Ammo Efficiency Unlocked</div>
+            <div style="color:var(--muted);font-size:19px;">Resource tempo increased. First loop accelerates.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="15">
+      <div class="left">
+        <div class="eyebrow">Scene 8</div>
+        <h1>Карта змінюється разом із тобою.</h1>
+        <p class="subtitle">Це і є головне відчуття гри: кампанія не стоїть на місці, вона реагує на твої рішення.</p>
+        <div class="vo">Bastion UA працює тоді, коли карта перестає бути декорацією і стає живою відповіддю на кожен твій крок.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="hud">
+            <div class="chip">💰 Ammo 486</div>
+            <div class="chip">🛡 Morale 80</div>
+            <div class="chip">⚡ Tempo Upgraded</div>
+          </div>
+          <div class="map">
+            <div class="map-shape"></div>
+            <div class="node safe" style="left:48%;top:38%;"></div>
+            <div class="node safe" style="left:66%;top:30%;"></div>
+            <div class="node danger" style="left:70%;top:56%;"></div>
+            <div class="label" style="left:46%;top:46%;">Kyiv / Stable</div>
+            <div class="label" style="left:63%;top:38%;">Chernihiv / Secured</div>
+            <div class="label" style="left:67%;top:64%;">Sumy / Final Pressure</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" data-duration="10">
+      <div class="left">
+        <div class="eyebrow">Scene 9</div>
+        <h1>Новий цикл. Сильніший старт.</h1>
+        <p class="subtitle">Кампанія не закінчується на першій перемозі. Вона кличе повернутися підготовленішим.</p>
+        <div class="vo">Ти не починаєш спочатку. Ти повертаєшся сильнішим.</div>
+      </div>
+      <div class="right">
+        <div class="mock">
+          <div class="prestige-box">
+            <div style="font-size:42px;margin-bottom:12px;">Ставка</div>
+            <div style="font-size:24px;color:var(--accent);margin-bottom:12px;">Campaign complete. Begin stronger cycle.</div>
+            <div style="color:var(--muted);font-size:20px;margin-bottom:20px;">Permanent bonus: production speed +10%</div>
+            <div class="choice active" style="text-align:center;font-size:22px;">Begin New Cycle</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const scenes = [...document.querySelectorAll('.scene')];
+    const progress = document.getElementById('progress');
+    const timer = document.getElementById('timer');
+    const sceneTag = document.getElementById('sceneTag');
+    const durations = scenes.map(s => Number(s.dataset.duration));
+    const total = durations.reduce((a, b) => a + b, 0);
+    let current = 0;
+    let elapsed = 0;
+
+    function format(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(Math.floor(sec % 60)).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function activate(index) {
+      scenes.forEach((s, i) => s.classList.toggle('active', i === index));
+      sceneTag.textContent = `Scene ${index + 1}`;
+    }
+
+    function runScene(index) {
+      if (index >= scenes.length) {
+        activate(scenes.length - 1);
+        progress.style.width = '100%';
+        timer.textContent = `${format(total)} / ${format(total)}`;
+        return;
+      }
+
+      current = index;
+      activate(index);
+
+      const duration = durations[index];
+      const startElapsed = durations.slice(0, index).reduce((a, b) => a + b, 0);
+      let local = 0;
+      const interval = setInterval(() => {
+        local += 0.2;
+        elapsed = startElapsed + local;
+        timer.textContent = `${format(elapsed)} / ${format(total)}`;
+        progress.style.width = `${Math.min(100, (elapsed / total) * 100)}%`;
+        if (local >= duration) {
+          clearInterval(interval);
+          runScene(index + 1);
+        }
+      }, 200);
+    }
+
+    activate(0);
+    timer.textContent = `00:00 / ${format(total)}`;
+    runScene(0);
+  </script>
+</body>
+</html>
