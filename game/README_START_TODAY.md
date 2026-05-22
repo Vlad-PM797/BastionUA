@@ -1,22 +1,22 @@
-# BastionUA — Unity Prototype (Week 3 ✅)
+# BastionUA — Unity Prototype (Week 5 ✅)
 
 ## Статус
-- Week 1: [`docs/week1_checkpoint.md`](../docs/week1_checkpoint.md)
-- Week 2: [`docs/week2_checkpoint.md`](../docs/week2_checkpoint.md)
-- Week 3: [`docs/week3_checkpoint.md`](../docs/week3_checkpoint.md)
+- Week 1–5 checkpoints: [`docs/`](../docs/)
+- GitHub: https://github.com/Vlad-PM797/BastionUA
 
 ## Швидкий старт
 Unity Hub → `E:\BastionUA\game` → Boot scene → **Play**
 
 ## Що працює
-- Core loop + map HUD + save/load
+- Core loop + **карта UA (4 регіони)** + save/load
 - **3 events:** Hostomel → Chornobaivka → Irpin
-- **Objective bar** — підказка наступного кроку
-- **Reset Save** — легенда зліва
-- Dev hotkeys: T, 1-3/QWE, B, S
+- **Units / upgrades / battle result popup**
+- **Battle balance** — регіон, morale, progression
+- Dev hotkeys: T, **1-4 / QWER**, B, S
 
-## Windows build
-Unity menu: **BastionUA → Build Windows Dev**
+## Windows build (share)
+Unity menu: **BastionUA → Build Windows Dev**  
+Output: `game/Builds/Windows/BastionUA.exe` (+ `_Data` folder)
 
-## Week 4 — наступне
-Units, upgrades, battle result popup
+## Week 6 — наступне
+Kharkiv event, release build, mobile spike

@@ -70,6 +70,8 @@ namespace BastionUA.Core
                 Regions = CreateDefault().Regions;
             }
 
+            RegionCatalog.EnsureAllRegions(Regions);
+
             if (string.IsNullOrEmpty(SelectedUnitId) || UnitCatalog.GetById(SelectedUnitId) == null)
             {
                 SelectedUnitId = UnitCatalog.TerritorialDefenseId;
@@ -146,20 +148,18 @@ namespace BastionUA.Core
 
         public static GameState CreateDefault()
         {
-            return new GameState
+            var defaultState = new GameState
             {
                 Ammo = GameConstants.InitialAmmo,
                 Morale = GameConstants.InitialMorale,
-                LastSelectedRegionId = "kyiv",
+                LastSelectedRegionId = RegionCatalog.KyivId,
                 LastSavedUtc = DateTime.UtcNow,
                 SelectedUnitId = UnitCatalog.TerritorialDefenseId,
-                Regions = new List<RegionState>
-                {
-                    new RegionState("kyiv", "Kyiv", RegionStatus.Danger),
-                    new RegionState("chernihiv", "Chernihiv", RegionStatus.Occupied),
-                    new RegionState("sumy", "Sumy", RegionStatus.Danger)
-                }
+                Regions = new List<RegionState>()
             };
+
+            RegionCatalog.EnsureAllRegions(defaultState.Regions);
+            return defaultState;
         }
     }
 }

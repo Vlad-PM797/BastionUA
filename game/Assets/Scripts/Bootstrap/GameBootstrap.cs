@@ -322,17 +322,22 @@ namespace BastionUA.Bootstrap
 
             if (IsRegionSelectPressed(KeyCode.Alpha1, KeyCode.Keypad1, KeyCode.Q))
             {
-                SelectRegion("kyiv");
+                SelectRegion(RegionCatalog.KyivId);
             }
 
             if (IsRegionSelectPressed(KeyCode.Alpha2, KeyCode.Keypad2, KeyCode.W))
             {
-                SelectRegion("chernihiv");
+                SelectRegion(RegionCatalog.ChernihivId);
             }
 
             if (IsRegionSelectPressed(KeyCode.Alpha3, KeyCode.Keypad3, KeyCode.E))
             {
-                SelectRegion("sumy");
+                SelectRegion(RegionCatalog.SumyId);
+            }
+
+            if (IsRegionSelectPressed(KeyCode.Alpha4, KeyCode.Keypad4, KeyCode.R))
+            {
+                SelectRegion(RegionCatalog.KharkivId);
             }
 
             if (Input.GetKeyDown(KeyCode.B))

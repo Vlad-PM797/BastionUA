@@ -1,14 +1,13 @@
-# Bastion UA — Week 4 (CLOSED)
+# Bastion UA — Week 5 (CLOSED)
 
 Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week4_checkpoint.md`](week4_checkpoint.md)
+Checkpoint: [`docs/week5_checkpoint.md`](week5_checkpoint.md)
 
-## Week 4 Deliverables
-- [x] Battle result popup (victory/defeat + stats)
-- [x] 4 units with battle modifiers
-- [x] 3 ammo-driven upgrades
-- [x] HUD progression panel + objective hint
-- [x] Verification tests (modifiers + upgrade purchase)
+## Week 5 Deliverables
+- [x] Map v2: UA silhouette + Kharkiv region
+- [x] Save migration for 4th region
+- [x] Battle balance (region difficulty, morale, progression HP)
+- [x] GitHub remote + build share docs
 
-## Week 5 Entry
-See [`docs/week4_checkpoint.md`](week4_checkpoint.md) § Next.
+## Week 6 Entry
+See [`docs/week5_checkpoint.md`](week5_checkpoint.md) § Next.

@@ -18,10 +18,13 @@ namespace BastionUA.UI
             _onRegionSelected = onRegionSelected;
             var landmassTransform = BuildMapPanel(parent);
             _mapRoot = landmassTransform;
+            BuildSilhouette(_mapRoot);
             BuildConnections(_mapRoot);
-            BuildMarker(_mapRoot, MapUiConstants.KyivLayout);
-            BuildMarker(_mapRoot, MapUiConstants.ChernihivLayout);
-            BuildMarker(_mapRoot, MapUiConstants.SumyLayout);
+
+            foreach (var region in RegionCatalog.All)
+            {
+                BuildMarker(_mapRoot, region.Layout);
+            }
         }
 
         public void Refresh(GameBootstrap bootstrap, GameState state)
@@ -63,10 +66,46 @@ namespace BastionUA.UI
             return landmass.transform;
         }
 
+        private static void BuildSilhouette(Transform mapRoot)
+        {
+            var silhouetteObject = new GameObject(
+                "UaSilhouette",
+                typeof(RectTransform),
+                typeof(MapSilhouetteGraphic));
+            silhouetteObject.transform.SetParent(mapRoot, false);
+            silhouetteObject.transform.SetAsFirstSibling();
+
+            var silhouetteRect = silhouetteObject.GetComponent<RectTransform>();
+            StretchFullScreen(silhouetteRect, 0f);
+
+            var silhouetteGraphic = silhouetteObject.GetComponent<MapSilhouetteGraphic>();
+            silhouetteGraphic.color = MapUiConstants.MapSilhouetteColor;
+            silhouetteGraphic.raycastTarget = false;
+            silhouetteGraphic.SetNormalizedPoints(MapUiConstants.UkraineSilhouettePoints);
+
+            var borderObject = new GameObject(
+                "UaSilhouetteBorder",
+                typeof(RectTransform),
+                typeof(MapSilhouetteGraphic));
+            borderObject.transform.SetParent(mapRoot, false);
+            borderObject.transform.SetAsFirstSibling();
+
+            var borderRect = borderObject.GetComponent<RectTransform>();
+            StretchFullScreen(borderRect, -4f);
+
+            var borderGraphic = borderObject.GetComponent<MapSilhouetteGraphic>();
+            borderGraphic.color = MapUiConstants.MapSilhouetteBorderColor;
+            borderGraphic.raycastTarget = false;
+            borderGraphic.SetNormalizedPoints(MapUiConstants.UkraineSilhouettePoints);
+        }
+
         private static void BuildConnections(Transform mapRoot)
         {
-            CreateConnection(mapRoot, MapUiConstants.ChernihivLayout, MapUiConstants.KyivLayout);
-            CreateConnection(mapRoot, MapUiConstants.KyivLayout, MapUiConstants.SumyLayout);
+            var connections = MapUiConstants.MapConnections;
+            for (var index = 0; index + 1 < connections.Length; index += 2)
+            {
+                CreateConnection(mapRoot, connections[index], connections[index + 1]);
+            }
         }
 
         private void BuildMarker(Transform mapRoot, MapRegionLayout layout)
@@ -113,7 +152,12 @@ namespace BastionUA.UI
             labelRect.sizeDelta = new Vector2(160f, 28f);
 
             var labelText = labelObject.GetComponent<Text>();
-            ConfigureText(labelText, layout.RegionId, MapUiConstants.MapLabelFontSize, TextAnchor.UpperCenter);
+            var definition = RegionCatalog.GetById(layout.RegionId);
+            ConfigureText(
+                labelText,
+                definition != null ? definition.DisplayName : layout.RegionId,
+                MapUiConstants.MapLabelFontSize,
+                TextAnchor.UpperCenter);
 
             _markers[layout.RegionId] = new MapMarkerUi(buttonImage, ringImage, selectionObject, labelText);
         }

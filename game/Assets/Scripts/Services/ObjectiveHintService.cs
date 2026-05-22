@@ -41,7 +41,30 @@ namespace BastionUA.Services
                 return GameUiConstants.ObjectiveIrpinPending;
             }
 
+            if (IsRegionOccupied(state, RegionCatalog.KharkivId))
+            {
+                return GameUiConstants.ObjectiveKharkiv;
+            }
+
             return GameUiConstants.ObjectiveProgression;
+        }
+
+        private static bool IsRegionOccupied(GameState state, string regionId)
+        {
+            if (state?.Regions == null)
+            {
+                return false;
+            }
+
+            foreach (var region in state.Regions)
+            {
+                if (region.RegionId == regionId)
+                {
+                    return region.Status == RegionStatus.Occupied;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -21,6 +21,16 @@ namespace BastionUA.Core
         public const int BattleDefeatMoraleLoss = 3;
         public const int BattleMaxRounds = 20;
         public const int BattleAmmoDamageDivisor = 5;
+        public const int BattleOccupiedEnemyHpBonus = 12;
+        public const int BattleOccupiedEnemyDamageBonus = 4;
+        public const int BattleMinEnemyDamage = 1;
+        public const int BattleLowMoraleThreshold = 30;
+        public const int BattleHighMoraleThreshold = 70;
+        public const int BattleLowMoraleDamagePercent = 90;
+        public const int BattleHighMoraleDamageBonus = 2;
+        public const int BattleProgressionBattlesStep = 4;
+        public const int BattleProgressionHpPerStep = 3;
+        public const int BattleProgressionHpCap = 15;
 
         public const int MinMorale = 0;
         public const int MinAmmo = 0;

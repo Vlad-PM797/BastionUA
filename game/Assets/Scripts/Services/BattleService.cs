@@ -16,15 +16,18 @@ namespace BastionUA.Services
 
     public sealed class BattleService
     {
+        private readonly BattleBalanceService _balanceService = new BattleBalanceService();
+
         public BattleResult Simulate(GameState state, RegionState region, BattleModifiers modifiers)
         {
             var safeModifiers = modifiers ?? new BattleModifiers();
+            var enemyHp = _balanceService.GetEnemyHp(region, state);
             var result = new BattleResult
             {
                 IsVictory = false,
                 AmmoSpent = 0,
                 PlayerHpRemaining = GameConstants.BattleBasePlayerHp,
-                EnemyHpRemaining = GameConstants.BattleBaseEnemyHp,
+                EnemyHpRemaining = enemyHp,
                 RegionDisplayName = region.DisplayName,
                 RegionStatusBefore = region.Status,
                 RegionStatusAfter = region.Status
@@ -38,11 +41,9 @@ namespace BastionUA.Services
             var playerDamage = GameConstants.BattleBasePlayerDamage +
                                (ammoBudget / GameConstants.BattleAmmoDamageDivisor) +
                                safeModifiers.PlayerDamageBonus;
+            playerDamage = _balanceService.ApplyMoraleToPlayerDamage(playerDamage, state.Morale);
 
-            var enemyDamage = GameConstants.BattleBaseEnemyDamage +
-                              (region.Status == RegionStatus.Occupied ? 4 : 0) -
-                              safeModifiers.EnemyDamageReduction;
-            enemyDamage = Mathf.Max(1, enemyDamage);
+            var enemyDamage = _balanceService.GetEnemyDamage(region, safeModifiers);
 
             var rounds = 0;
             while (result.PlayerHpRemaining > 0 &&
@@ -78,7 +79,7 @@ namespace BastionUA.Services
 
             Debug.Log(
                 $"[BattleService] Region={region.DisplayName}, Victory={result.IsVictory}, " +
-                $"AmmoSpent={result.AmmoSpent}, PlayerHP={result.PlayerHpRemaining}, EnemyHP={result.EnemyHpRemaining}, " +
+                $"EnemyHP={enemyHp}, AmmoSpent={result.AmmoSpent}, PlayerHP={result.PlayerHpRemaining}, " +
                 $"Morale={state.Morale}, RegionStatus={region.Status}");
 
             return result;

@@ -43,6 +43,8 @@ _unity_bootstrap/
 
 # Optional local logs from verification runs
 logs/*.log
+game/verification_*.log
+game/*.log
 
 # Local builds
 game/Builds/

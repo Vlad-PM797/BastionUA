@@ -27,6 +27,8 @@ namespace BastionUA.EditorTools
                 failures += VerifyResourceLoop() ? 0 : 1;
                 failures += VerifyMapSelection() ? 0 : 1;
                 failures += VerifyBattleChangesRegionState() ? 0 : 1;
+                failures += VerifyKharkivRegionMigration() ? 0 : 1;
+                failures += VerifyBattleBalanceScalesByRegion() ? 0 : 1;
                 failures += VerifyProgressionModifiers() ? 0 : 1;
                 failures += VerifyUpgradePurchase() ? 0 : 1;
                 failures += VerifySaveLoadRoundTrip() ? 0 : 1;
@@ -146,6 +148,76 @@ namespace BastionUA.EditorTools
             return true;
         }
 
+        private static bool VerifyKharkivRegionMigration()
+        {
+            var legacyState = new GameState
+            {
+                Ammo = GameConstants.InitialAmmo,
+                Morale = GameConstants.InitialMorale,
+                LastSelectedRegionId = RegionCatalog.KyivId,
+                Regions = new System.Collections.Generic.List<RegionState>
+                {
+                    new RegionState(RegionCatalog.KyivId, "Kyiv", RegionStatus.Danger),
+                    new RegionState(RegionCatalog.ChernihivId, "Chernihiv", RegionStatus.Occupied),
+                    new RegionState(RegionCatalog.SumyId, "Sumy", RegionStatus.Danger)
+                }
+            };
+
+            legacyState.Normalize();
+
+            if (legacyState.Regions.Count != RegionCatalog.All.Count)
+            {
+                Debug.LogError("[UnityVerification] Legacy save should migrate to four regions.");
+                return false;
+            }
+
+            var kharkiv = legacyState.Regions.Find(region => region.RegionId == RegionCatalog.KharkivId);
+            if (kharkiv == null)
+            {
+                Debug.LogError("[UnityVerification] Kharkiv region missing after migration.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Kharkiv region migration OK.");
+            return true;
+        }
+
+        private static bool VerifyBattleBalanceScalesByRegion()
+        {
+            var balanceService = new BattleBalanceService();
+            var mapService = new MapService();
+
+            var kyivState = GameState.CreateDefault();
+            var kharkivState = GameState.CreateDefault();
+            kyivState.Ammo = 250;
+            kharkivState.Ammo = 250;
+
+            var kyivRegion = mapService.GetRegion(kyivState, RegionCatalog.KyivId);
+            var kharkivRegion = mapService.GetRegion(kharkivState, RegionCatalog.KharkivId);
+
+            var kyivEnemyHp = balanceService.GetEnemyHp(kyivRegion, kyivState);
+            var kharkivEnemyHp = balanceService.GetEnemyHp(kharkivRegion, kharkivState);
+
+            if (kharkivEnemyHp <= kyivEnemyHp)
+            {
+                Debug.LogError("[UnityVerification] Kharkiv should have higher enemy HP than Kyiv.");
+                return false;
+            }
+
+            var baseDamage = GameConstants.BattleBasePlayerDamage + 10;
+            var lowMoraleDamage = balanceService.ApplyMoraleToPlayerDamage(baseDamage, 10);
+            var highMoraleDamage = balanceService.ApplyMoraleToPlayerDamage(baseDamage, 90);
+
+            if (lowMoraleDamage >= baseDamage || highMoraleDamage <= baseDamage)
+            {
+                Debug.LogError("[UnityVerification] Morale should modify player damage.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Battle balance scaling OK.");
+            return true;
+        }
+
         private static bool VerifyProgressionModifiers()
         {
             var progressionService = new ProgressionService();
@@ -232,7 +304,7 @@ namespace BastionUA.EditorTools
                 var loadedJson = File.ReadAllText(savePath);
                 var loaded = JsonUtility.FromJson<GameState>(loadedJson);
 
-                if (loaded == null || loaded.Regions == null || loaded.Regions.Count != 3)
+                if (loaded == null || loaded.Regions == null || loaded.Regions.Count != RegionCatalog.All.Count)
                 {
                     Debug.LogError("[UnityVerification] Save/load failed: invalid deserialized state.");
                     return false;
@@ -425,9 +497,9 @@ namespace BastionUA.EditorTools
             }
 
             var hint = ObjectiveHintService.GetHint(state);
-            if (hint != GameUiConstants.ObjectiveProgression)
+            if (hint != GameUiConstants.ObjectiveKharkiv)
             {
-                Debug.LogError("[UnityVerification] Objective hint should switch to progression after Irpin.");
+                Debug.LogError("[UnityVerification] Objective hint should target Kharkiv after Irpin.");
                 return false;
             }
 
