@@ -36,6 +36,7 @@ namespace BastionUA.Core
         public DateTime LastSavedUtc;
         public List<string> CompletedEventIds = new List<string>();
         public int TotalBattles;
+        public bool HasSeenOnboarding;
 
         public void Normalize()
         {

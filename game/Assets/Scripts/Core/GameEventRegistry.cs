@@ -19,6 +19,13 @@ namespace BastionUA.Core
                 TriggerMode = EventTriggerMode.OnProgress,
                 RequiredCompletedEventIds = new[] { HostomelEventCatalog.EventId },
                 MinBattleCount = GameConstants.ChornobaivkaMinBattleCount
+            },
+            new GameEventScheduleEntry
+            {
+                EventId = IrpinEventCatalog.EventId,
+                TriggerMode = EventTriggerMode.OnProgress,
+                RequiredCompletedEventIds = new[] { ChornobaivkaEventCatalog.EventId },
+                MinBattleCount = GameConstants.IrpinMinBattleCount
             }
         };
 
@@ -37,6 +44,11 @@ namespace BastionUA.Core
             if (eventId == ChornobaivkaEventCatalog.EventId)
             {
                 return ChornobaivkaEventCatalog.Create();
+            }
+
+            if (eventId == IrpinEventCatalog.EventId)
+            {
+                return IrpinEventCatalog.Create();
             }
 
             return null;

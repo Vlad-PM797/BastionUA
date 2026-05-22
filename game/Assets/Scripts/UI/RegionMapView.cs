@@ -46,7 +46,7 @@ namespace BastionUA.UI
                 new Vector2(0f, 0f),
                 new Vector2(1f, 1f),
                 new Vector2(GameUiConstants.SidePanelWidth, GameUiConstants.BottomBarHeight),
-                new Vector2(-24f, -GameUiConstants.TopBarHeight));
+                new Vector2(-24f, -GameUiConstants.HudTopInset));
 
             CreateTitle(mapPanel.transform, "MapTitle", MapUiConstants.MapPanelTitle);
 

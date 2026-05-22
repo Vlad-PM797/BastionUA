@@ -59,5 +59,21 @@ namespace BastionUA.Services
                 Debug.LogError($"[SaveService] Save failed: {exception}");
             }
         }
+
+        public void DeleteSave()
+        {
+            try
+            {
+                if (File.Exists(_savePath))
+                {
+                    File.Delete(_savePath);
+                    Debug.Log("[SaveService] Save file deleted.");
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"[SaveService] Delete save failed: {exception}");
+            }
+        }
     }
 }

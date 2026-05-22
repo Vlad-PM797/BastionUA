@@ -22,5 +22,6 @@ namespace BastionUA.Core
         public const int MinRegionStatusStep = -1;
 
         public const int ChornobaivkaMinBattleCount = 1;
+        public const int IrpinMinBattleCount = 2;
     }
 }

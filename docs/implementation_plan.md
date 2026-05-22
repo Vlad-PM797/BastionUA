@@ -1,24 +1,14 @@
-# Bastion UA — Week 2 (CLOSED)
+# Bastion UA — Week 3 (CLOSED)
 
 Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week2_checkpoint.md`](week2_checkpoint.md)  
-Previous: [`docs/week1_checkpoint.md`](week1_checkpoint.md)
+Checkpoint: [`docs/week3_checkpoint.md`](week3_checkpoint.md)
 
-## Week 2 Deliverables
-- [x] Git repository + initial commit
-- [x] Event trigger system (`GameEventRegistry`, `EventTriggerService`)
-- [x] Event #2: Чорнобаївка (after Hostomel + 1 battle)
-- [x] `GameState.TotalBattles`
-- [x] Interactive map HUD (`RegionMapView`, `MapUiConstants`)
-- [x] Legend panel + node-based region selection
-- [x] Manual QA confirmed (map, events)
-- [x] Week 2 checkpoint doc
+## Week 3 Deliverables
+- [x] Event #3: Ірпінь
+- [x] Objective hint + onboarding
+- [x] Reset Save
+- [x] Windows dev build menu
+- [x] Manual QA confirmed
 
-## Event pipeline
-| Event | Trigger | Prerequisites |
-|-------|---------|---------------|
-| Гостомель | OnSessionStart | — |
-| Чорнобаївка | OnProgress | Hostomel + ≥1 battle |
-
-## Week 3 Entry
-See [`docs/week2_checkpoint.md`](week2_checkpoint.md) §6.
+## Week 4 Entry
+See [`docs/week3_checkpoint.md`](week3_checkpoint.md) §4.

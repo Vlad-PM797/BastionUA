@@ -32,6 +32,7 @@ namespace BastionUA.EditorTools
                 failures += VerifyHudBootstrap() ? 0 : 1;
                 failures += VerifyHostomelEventFlow() ? 0 : 1;
                 failures += VerifyChornobaivkaEventFlow() ? 0 : 1;
+                failures += VerifyIrpinEventFlow() ? 0 : 1;
             }
             catch (Exception exception)
             {
@@ -324,6 +325,49 @@ namespace BastionUA.EditorTools
             }
 
             Debug.Log("[UnityVerification] Chornobaivka event flow OK.");
+            return true;
+        }
+
+        private static bool VerifyIrpinEventFlow()
+        {
+            var state = GameState.CreateDefault();
+            state.Normalize();
+            var mapService = new MapService();
+            var eventService = new EventService();
+            var triggerService = new EventTriggerService();
+
+            state.MarkEventCompleted(HostomelEventCatalog.EventId);
+            state.MarkEventCompleted(ChornobaivkaEventCatalog.EventId);
+            state.TotalBattles = GameConstants.ChornobaivkaMinBattleCount;
+
+            if (triggerService.GetNextEvent(state, EventTriggerMode.OnProgress) != null)
+            {
+                Debug.LogError("[UnityVerification] Irpin should wait for second battle.");
+                return false;
+            }
+
+            state.TotalBattles = GameConstants.IrpinMinBattleCount;
+            var irpinEvent = triggerService.GetNextEvent(state, EventTriggerMode.OnProgress);
+            if (irpinEvent == null || irpinEvent.EventId != IrpinEventCatalog.EventId)
+            {
+                Debug.LogError("[UnityVerification] Irpin should be ready after Chornobaivka + 2 battles.");
+                return false;
+            }
+
+            if (!eventService.TryApplyChoice(state, mapService, irpinEvent, 0, out _))
+            {
+                Debug.LogError("[UnityVerification] Irpin choice apply failed.");
+                return false;
+            }
+
+            var hint = ObjectiveHintService.GetHint(state);
+            if (string.IsNullOrEmpty(hint))
+            {
+                Debug.LogError("[UnityVerification] Objective hint missing after Irpin.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Irpin event flow OK.");
             return true;
         }
     }

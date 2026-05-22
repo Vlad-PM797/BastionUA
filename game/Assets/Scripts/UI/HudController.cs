@@ -13,6 +13,7 @@ namespace BastionUA.UI
         private Text _ammoText;
         private Text _moraleText;
         private Text _selectedRegionText;
+        private Text _objectiveText;
 
         private void Awake()
         {
@@ -82,6 +83,7 @@ namespace BastionUA.UI
             _moraleText = CreateStatText(topBar.transform, "MoraleText", new Vector2(0.34f, 0.5f), $"{GameUiConstants.LabelMorale}: --");
             _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.66f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
 
+            BuildObjectiveBar(canvasObject.transform);
             BuildLegendPanel(canvasObject.transform);
             _regionMapView = new RegionMapView(canvasObject.transform, OnRegionSelected);
 
@@ -98,6 +100,20 @@ namespace BastionUA.UI
             Debug.Log("[HudController] HUD with map built.");
         }
 
+        private void BuildObjectiveBar(Transform canvasTransform)
+        {
+            var objectiveBar = CreatePanel(
+                canvasTransform,
+                "ObjectiveBar",
+                new Vector2(0f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(0f, -GameUiConstants.HudTopInset),
+                new Vector2(0f, -GameUiConstants.TopBarHeight));
+
+            _objectiveText = CreateStatText(objectiveBar.transform, "ObjectiveText", new Vector2(0.02f, 0.5f), $"{GameUiConstants.LabelObjective}: --");
+            _objectiveText.fontSize = GameUiConstants.BaseFontSize;
+        }
+
         private void BuildLegendPanel(Transform canvasTransform)
         {
             var legendPanel = CreatePanel(
@@ -106,12 +122,13 @@ namespace BastionUA.UI
                 new Vector2(0f, 0f),
                 new Vector2(0f, 1f),
                 new Vector2(0f, GameUiConstants.BottomBarHeight),
-                new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.TopBarHeight));
+                new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.HudTopInset));
 
             CreateTitle(legendPanel.transform, "LegendTitle", MapUiConstants.LegendTitle);
             CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.78f);
             CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.62f);
             CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.46f);
+            CreateActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.12f), OnResetClicked);
         }
 
         private void RefreshAll()
@@ -123,8 +140,14 @@ namespace BastionUA.UI
             var selectedRegion = _bootstrap.GetRegion(state.LastSelectedRegionId);
             var selectedLabel = selectedRegion != null ? selectedRegion.DisplayName : state.LastSelectedRegionId;
             _selectedRegionText.text = $"{GameUiConstants.LabelSelectedRegion}: {selectedLabel}";
+            _objectiveText.text = $"{GameUiConstants.LabelObjective}: {_bootstrap.GetObjectiveHint()}";
 
             _regionMapView.Refresh(_bootstrap, state);
+        }
+
+        private void OnResetClicked()
+        {
+            _bootstrap?.ResetProgress();
         }
 
         private void OnRegionSelected(string regionId)

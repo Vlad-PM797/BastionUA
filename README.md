@@ -25,8 +25,9 @@
 | 05 | [Legal](./docs/05_legal.md) | Юр-структура, ліцензії бригад, App Store compliance |
 | — | [Week 1 Checkpoint](./docs/week1_checkpoint.md) | ✅ Core loop, HUD, Hostomel |
 | — | [Week 2 Checkpoint](./docs/week2_checkpoint.md) | ✅ Events pipeline, map HUD, Chornobaivka |
+| — | [Week 3 Checkpoint](./docs/week3_checkpoint.md) | ✅ Irpin event, objectives, reset save, build |
 
-### Unity prototype (Week 2 ✅)
+### Unity prototype (Week 3 ✅)
 - Проєкт: [`game/`](./game/) — Unity 6000.4.4f1
 - Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
 

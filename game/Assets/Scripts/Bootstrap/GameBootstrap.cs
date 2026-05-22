@@ -24,6 +24,11 @@ namespace BastionUA.Bootstrap
         public GameState GameState => _gameState;
         public bool IsGameplayPaused => _gameplayPaused;
 
+        public string GetObjectiveHint()
+        {
+            return ObjectiveHintService.GetHint(_gameState);
+        }
+
         private void Awake()
         {
             _saveService = new SaveService();
@@ -101,6 +106,7 @@ namespace BastionUA.Bootstrap
             }
 
             _resourceService.ManualTap(_gameState);
+            MarkOnboardingSeen();
             LogCurrentState();
         }
 
@@ -112,6 +118,7 @@ namespace BastionUA.Bootstrap
             }
 
             _mapService.SelectRegion(_gameState, regionId);
+            MarkOnboardingSeen();
 
             var region = _mapService.GetRegion(_gameState, regionId);
             if (region == null)
@@ -140,6 +147,7 @@ namespace BastionUA.Bootstrap
 
             _battleService.Simulate(_gameState, region);
             _gameState.TotalBattles++;
+            MarkOnboardingSeen();
             _saveService.Save(_gameState);
             LogCurrentState();
             TryQueueNextEvent(EventTriggerMode.OnProgress);
@@ -149,6 +157,35 @@ namespace BastionUA.Bootstrap
         {
             _saveService.Save(_gameState);
             Debug.Log("[GameBootstrap] Manual save triggered.");
+        }
+
+        public void ResetProgress()
+        {
+            try
+            {
+                _saveService.DeleteSave();
+                _gameState = GameState.CreateDefault();
+                _gameState.Normalize();
+                _saveService.Save(_gameState);
+                LogCurrentState();
+                TryQueueNextEvent(EventTriggerMode.OnSessionStart);
+                Debug.Log("[GameBootstrap] Progress reset.");
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogError($"[GameBootstrap] Reset failed: {exception}");
+            }
+        }
+
+        private void MarkOnboardingSeen()
+        {
+            if (_gameState.HasSeenOnboarding)
+            {
+                return;
+            }
+
+            _gameState.HasSeenOnboarding = true;
+            _saveService.Save(_gameState);
         }
 
         private void OnApplicationQuit()
