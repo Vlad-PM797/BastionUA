@@ -41,6 +41,16 @@ namespace BastionUA.Services
                 return GameUiConstants.ObjectiveIrpinPending;
             }
 
+            if (!state.IsEventCompleted(KharkivEventCatalog.EventId))
+            {
+                if (state.TotalBattles < GameConstants.KharkivMinBattleCount)
+                {
+                    return GameUiConstants.ObjectiveThirdBattle;
+                }
+
+                return GameUiConstants.ObjectiveKharkivEventPending;
+            }
+
             if (IsRegionOccupied(state, RegionCatalog.KharkivId))
             {
                 return GameUiConstants.ObjectiveKharkiv;

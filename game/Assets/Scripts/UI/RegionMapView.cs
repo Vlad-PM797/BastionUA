@@ -53,7 +53,7 @@ namespace BastionUA.UI
 
             CreateTitle(mapPanel.transform, "MapTitle", MapUiConstants.MapPanelTitle);
 
-            var landmass = new GameObject("MapLandmass", typeof(RectTransform), typeof(Image));
+            var landmass = new GameObject("MapLandmass", typeof(RectTransform));
             landmass.transform.SetParent(mapPanel.transform, false);
 
             var landRect = landmass.GetComponent<RectTransform>();
@@ -61,42 +61,14 @@ namespace BastionUA.UI
             landRect.anchorMax = new Vector2(0.5f, 0.5f);
             landRect.pivot = new Vector2(0.5f, 0.5f);
             landRect.sizeDelta = new Vector2(MapUiConstants.MapLandmassWidth, MapUiConstants.MapLandmassHeight);
-            landmass.GetComponent<Image>().color = MapUiConstants.MapLandColor;
 
+            LayoutRebuilder.ForceRebuildLayoutImmediate(landRect);
             return landmass.transform;
         }
 
         private static void BuildSilhouette(Transform mapRoot)
         {
-            var silhouetteObject = new GameObject(
-                "UaSilhouette",
-                typeof(RectTransform),
-                typeof(MapSilhouetteGraphic));
-            silhouetteObject.transform.SetParent(mapRoot, false);
-            silhouetteObject.transform.SetAsFirstSibling();
-
-            var silhouetteRect = silhouetteObject.GetComponent<RectTransform>();
-            StretchFullScreen(silhouetteRect, 0f);
-
-            var silhouetteGraphic = silhouetteObject.GetComponent<MapSilhouetteGraphic>();
-            silhouetteGraphic.color = MapUiConstants.MapSilhouetteColor;
-            silhouetteGraphic.raycastTarget = false;
-            silhouetteGraphic.SetNormalizedPoints(MapUiConstants.UkraineSilhouettePoints);
-
-            var borderObject = new GameObject(
-                "UaSilhouetteBorder",
-                typeof(RectTransform),
-                typeof(MapSilhouetteGraphic));
-            borderObject.transform.SetParent(mapRoot, false);
-            borderObject.transform.SetAsFirstSibling();
-
-            var borderRect = borderObject.GetComponent<RectTransform>();
-            StretchFullScreen(borderRect, -4f);
-
-            var borderGraphic = borderObject.GetComponent<MapSilhouetteGraphic>();
-            borderGraphic.color = MapUiConstants.MapSilhouetteBorderColor;
-            borderGraphic.raycastTarget = false;
-            borderGraphic.SetNormalizedPoints(MapUiConstants.UkraineSilhouettePoints);
+            MapSilhouetteFactory.BuildSilhouette(mapRoot);
         }
 
         private static void BuildConnections(Transform mapRoot)

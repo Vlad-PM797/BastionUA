@@ -39,5 +39,6 @@ namespace BastionUA.Core
 
         public const int ChornobaivkaMinBattleCount = 1;
         public const int IrpinMinBattleCount = 2;
+        public const int KharkivMinBattleCount = 3;
     }
 }

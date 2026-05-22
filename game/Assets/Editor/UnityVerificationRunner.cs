@@ -37,6 +37,7 @@ namespace BastionUA.EditorTools
                 failures += VerifyHostomelEventFlow() ? 0 : 1;
                 failures += VerifyChornobaivkaEventFlow() ? 0 : 1;
                 failures += VerifyIrpinEventFlow() ? 0 : 1;
+                failures += VerifyKharkivEventFlow() ? 0 : 1;
             }
             catch (Exception exception)
             {
@@ -497,13 +498,72 @@ namespace BastionUA.EditorTools
             }
 
             var hint = ObjectiveHintService.GetHint(state);
-            if (hint != GameUiConstants.ObjectiveKharkiv)
+            if (hint != GameUiConstants.ObjectiveThirdBattle)
             {
-                Debug.LogError("[UnityVerification] Objective hint should target Kharkiv after Irpin.");
+                Debug.LogError("[UnityVerification] Objective hint should require third battle after Irpin.");
                 return false;
             }
 
             Debug.Log("[UnityVerification] Irpin event flow OK.");
+            return true;
+        }
+
+        private static bool VerifyKharkivEventFlow()
+        {
+            var state = GameState.CreateDefault();
+            state.Normalize();
+            var mapService = new MapService();
+            var eventService = new EventService();
+            var triggerService = new EventTriggerService();
+
+            state.MarkEventCompleted(HostomelEventCatalog.EventId);
+            state.MarkEventCompleted(ChornobaivkaEventCatalog.EventId);
+            state.MarkEventCompleted(IrpinEventCatalog.EventId);
+            state.TotalBattles = GameConstants.IrpinMinBattleCount;
+
+            if (triggerService.GetNextEvent(state, EventTriggerMode.OnProgress) != null)
+            {
+                Debug.LogError("[UnityVerification] Kharkiv should wait for third battle.");
+                return false;
+            }
+
+            state.TotalBattles = GameConstants.KharkivMinBattleCount;
+            var kharkivEvent = triggerService.GetNextEvent(state, EventTriggerMode.OnProgress);
+            if (kharkivEvent == null || kharkivEvent.EventId != KharkivEventCatalog.EventId)
+            {
+                Debug.LogError("[UnityVerification] Kharkiv should be ready after Irpin + 3 battles.");
+                return false;
+            }
+
+            var kharkivBefore = mapService.GetRegion(state, KharkivEventCatalog.TargetRegionId);
+            var statusBefore = kharkivBefore.Status;
+
+            if (!eventService.TryApplyChoice(state, mapService, kharkivEvent, 1, out _))
+            {
+                Debug.LogError("[UnityVerification] Kharkiv choice apply failed.");
+                return false;
+            }
+
+            if (!state.IsEventCompleted(KharkivEventCatalog.EventId))
+            {
+                Debug.LogError("[UnityVerification] Kharkiv not marked completed.");
+                return false;
+            }
+
+            if (kharkivBefore.Status == statusBefore)
+            {
+                Debug.LogError("[UnityVerification] Kharkiv event should improve region status.");
+                return false;
+            }
+
+            var hint = ObjectiveHintService.GetHint(state);
+            if (hint != GameUiConstants.ObjectiveKharkiv && hint != GameUiConstants.ObjectiveProgression)
+            {
+                Debug.LogError("[UnityVerification] Unexpected objective hint after Kharkiv event.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Kharkiv event flow OK.");
             return true;
         }
     }

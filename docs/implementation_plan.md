@@ -1,13 +1,13 @@
-# Bastion UA — Week 5 (CLOSED)
+# Bastion UA — Week 6 (CLOSED)
 
 Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week5_checkpoint.md`](week5_checkpoint.md)
+Checkpoint: [`docs/week6_checkpoint.md`](week6_checkpoint.md)
 
-## Week 5 Deliverables
-- [x] Map v2: UA silhouette + Kharkiv region
-- [x] Save migration for 4th region
-- [x] Battle balance (region difficulty, morale, progression HP)
-- [x] GitHub remote + build share docs
+## Week 6 Deliverables
+- [x] Accurate UA map silhouette with Crimea
+- [x] Event #4: Kharkiv
+- [x] Objective hints updated
+- [x] Verification test for Kharkiv event
 
-## Week 6 Entry
-See [`docs/week5_checkpoint.md`](week5_checkpoint.md) § Next.
+## Week 7 Entry
+See [`docs/week6_checkpoint.md`](week6_checkpoint.md) § Next.
