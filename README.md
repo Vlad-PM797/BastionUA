@@ -30,16 +30,28 @@
 | — | [Week 5 Checkpoint](./docs/week5_checkpoint.md) | ✅ Map v2, Kharkiv, battle balance |
 | — | [Week 7 Checkpoint](./docs/week7_checkpoint.md) | ✅ UA palette, map PNG, HUD reskin |
 | — | [Week 8 Checkpoint](./docs/week8_checkpoint.md) | ✅ Popup polish, release build, demo freeze |
+| — | [Week 9 Checkpoint](./docs/week9_checkpoint.md) | ✅ Prestige, SFX stub, event log |
+| — | [Week 10 Checkpoint](./docs/week10_checkpoint.md) | ✅ Android build, demo zip, UX hints |
+| — | [Post-Solo Plan](./docs/post_solo_plan.md) | 🔄 Playtest → demo → MVP gate |
 
-### Unity prototype (Week 8 ✅ — solo slice complete)
+### Unity prototype (Week 10 ✅ → Post-solo)
 - Проєкт: [`game/`](./game/) — Unity 6000.4.4f1
 - Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
 - **GitHub**: https://github.com/Vlad-PM797/BastionUA
 
-#### Share Windows build
-1. **Demo / pitch:** Unity → **BastionUA → Build Windows Release** → `game/Builds/WindowsRelease/`
-2. **Dev debug:** Unity → **BastionUA → Build Windows Dev** → `game/Builds/Windows/`
-3. Архів папки → надіслати `BastionUA.exe` + `BastionUA_Data`
+#### Share builds
+| Menu | Output |
+|------|--------|
+| **Build Windows Release** | `Builds/WindowsRelease/` |
+| **Package Windows Release Demo** | `Builds/BastionUA-Windows-demo.zip` |
+| **Build Android Dev** | `Builds/Android/BastionUA-dev.apk` |
+| **Build Windows Dev** | `Builds/Windows/` |
+
+#### Post-solo (зараз)
+1. Зібрати demo zip → 3–5 playtesters — [`docs/playtest_guide_ua.md`](./docs/playtest_guide_ua.md)
+2. Top-3 fixes — [`docs/playtest_backlog.md`](./docs/playtest_backlog.md)
+3. Demo video + one-pager — [`docs/post_solo_plan.md`](./docs/post_solo_plan.md)
+4. Team MVP gate — [`docs/mvp_gap_analysis.md`](./docs/mvp_gap_analysis.md)
 
 ---
 

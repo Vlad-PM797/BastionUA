@@ -11,7 +11,7 @@ namespace BastionUA.EditorTools
         [MenuItem("BastionUA/Build Windows Dev")]
         public static void BuildWindowsDevelopment()
         {
-            WindowsBuildUtility.BuildWindows(true, BuildFolder, BuildFileName);
+            PlayerBuildUtility.BuildWindows(true, BuildFolder, BuildFileName);
         }
     }
 }

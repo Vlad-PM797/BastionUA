@@ -562,7 +562,8 @@ namespace BastionUA.EditorTools
 
             state.HasSeenOnboarding = true;
             var hint = ObjectiveHintService.GetHint(state);
-            if (hint != GameUiConstants.ObjectiveKharkiv && hint != GameUiConstants.ObjectiveProgression)
+            if (hint != GameUiConstants.ObjectiveLiberateRegions &&
+                hint != GameUiConstants.ObjectiveProgression)
             {
                 Debug.LogError("[UnityVerification] Unexpected objective hint after Kharkiv event.");
                 return false;

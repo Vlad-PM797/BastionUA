@@ -51,9 +51,9 @@ namespace BastionUA.Services
                 return GameUiConstants.ObjectiveKharkivEventPending;
             }
 
-            if (IsRegionOccupied(state, RegionCatalog.KharkivId))
+            if (HasOccupiedRegion(state))
             {
-                return GameUiConstants.ObjectiveKharkiv;
+                return GameUiConstants.ObjectiveLiberateRegions;
             }
 
             if (CanPrestige(state))
@@ -74,7 +74,7 @@ namespace BastionUA.Services
             return new PrestigeService().CanPrestige(state);
         }
 
-        private static bool IsRegionOccupied(GameState state, string regionId)
+        private static bool HasOccupiedRegion(GameState state)
         {
             if (state?.Regions == null)
             {
@@ -83,9 +83,9 @@ namespace BastionUA.Services
 
             foreach (var region in state.Regions)
             {
-                if (region.RegionId == regionId)
+                if (region.Status == RegionStatus.Occupied)
                 {
-                    return region.Status == RegionStatus.Occupied;
+                    return true;
                 }
             }
 

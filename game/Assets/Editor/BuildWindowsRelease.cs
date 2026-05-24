@@ -11,7 +11,7 @@ namespace BastionUA.EditorTools
         [MenuItem("BastionUA/Build Windows Release")]
         public static void BuildWindowsReleasePlayer()
         {
-            WindowsBuildUtility.BuildWindows(false, BuildFolder, BuildFileName);
+            PlayerBuildUtility.BuildWindows(false, BuildFolder, BuildFileName);
         }
     }
 }
