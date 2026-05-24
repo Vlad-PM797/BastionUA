@@ -34,7 +34,11 @@ namespace BastionUA.EditorTools
 
                 var buildRoot = Path.GetFullPath(WindowsReleaseFolder);
                 var outputPath = Path.GetFullPath(OutputZipName);
-                ZipFile.CreateFromDirectory(buildRoot, outputPath, CompressionLevel.Optimal, false);
+                ZipFile.CreateFromDirectory(
+                    buildRoot,
+                    outputPath,
+                    System.IO.Compression.CompressionLevel.Optimal,
+                    false);
 
                 Debug.Log($"[DemoPackageUtility] Demo package created: {outputPath}");
             }
