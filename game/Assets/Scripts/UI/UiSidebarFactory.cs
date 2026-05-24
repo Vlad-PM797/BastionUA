@@ -12,7 +12,8 @@ namespace BastionUA.UI
             string name,
             Vector2 anchorMin,
             Vector2 anchorMax,
-            Color backgroundColor)
+            Color backgroundColor,
+            bool clipChildren = false)
         {
             var panelObject = new GameObject(name, typeof(RectTransform), typeof(Image));
             panelObject.transform.SetParent(parent, false);
@@ -26,6 +27,12 @@ namespace BastionUA.UI
             var image = panelObject.GetComponent<Image>();
             image.color = backgroundColor;
             image.raycastTarget = false;
+
+            if (clipChildren)
+            {
+                panelObject.AddComponent<RectMask2D>();
+            }
+
             return rectTransform;
         }
 

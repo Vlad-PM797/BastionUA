@@ -97,13 +97,18 @@ namespace BastionUA.Core
         public const float MapVignetteInnerRadius = 0.38f;
         public const float MapFrameInnerInsetPixels = 4f;
 
-        public const float SidebarLogPanelTopAnchor = 0.71f;
-        public const float SidebarLogPanelBottomAnchor = 0.58f;
+        public const float SidebarLogPanelTopAnchor = 0.69f;
+        public const float SidebarLogPanelBottomAnchor = 0.56f;
+        public const float SidebarEventLogTitleAnchor = 0.71f;
+        public const float SidebarUnitsTitleAnchor = 0.52f;
+        public const float SidebarUnitsFirstAnchor = 0.48f;
+        public const float SidebarUnitsRowSpacing = 0.06f;
+        public const float SidebarUpgradesTitleAnchor = 0.24f;
         public const float SidebarUpgradeRowHeight = 34f;
         public const float SidebarUpgradeRowSpacing = 0.065f;
-        public const float SidebarUpgradeFirstAnchor = 0.21f;
-        public const float SidebarFooterBottomAnchor = 0.02f;
-        public const float SidebarFooterTopAnchor = 0.075f;
+        public const float SidebarUpgradeFirstAnchor = 0.195f;
+        public const float SidebarFooterBottomAnchor = 0.01f;
+        public const float SidebarFooterTopAnchor = 0.065f;
         public const float SidebarResetButtonWidth = 236f;
         public const float SidebarResetButtonHeight = 34f;
         public const float SidebarPurchaseButtonWidth = 48f;

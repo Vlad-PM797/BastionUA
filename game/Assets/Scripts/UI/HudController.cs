@@ -223,13 +223,14 @@ namespace BastionUA.UI
             CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.90f);
             CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.84f);
             CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.78f);
-            CreateSectionTitle(legendPanel.transform, "EventLogTitle", GameUiConstants.LabelEventLog, 0.72f);
+            CreateSectionTitle(legendPanel.transform, "EventLogTitle", GameUiConstants.LabelEventLog, GameUiConstants.SidebarEventLogTitleAnchor);
             var logPanel = UiSidebarFactory.CreateInsetPanel(
                 legendPanel.transform,
                 "EventLogPanel",
                 new Vector2(0.06f, GameUiConstants.SidebarLogPanelBottomAnchor),
                 new Vector2(0.94f, GameUiConstants.SidebarLogPanelTopAnchor),
-                GameVisualPalette.SidebarInsetPanel);
+                GameVisualPalette.SidebarInsetPanel,
+                clipChildren: true);
             _eventLogText = UiSidebarFactory.CreateEventLogText(logPanel);
             BuildProgressionPanel(legendPanel.transform);
             UiSidebarFactory.CreateFooterResetButton(legendPanel.transform, OnResetClicked);
@@ -251,13 +252,13 @@ namespace BastionUA.UI
 
         private void BuildProgressionPanel(Transform legendPanel)
         {
-            CreateSectionTitle(legendPanel, "UnitsTitle", GameUiConstants.LabelUnits, 0.56f);
+            CreateSectionTitle(legendPanel, "UnitsTitle", GameUiConstants.LabelUnits, GameUiConstants.SidebarUnitsTitleAnchor);
 
-            var unitAnchors = new[] { 0.50f, 0.44f, 0.38f, 0.32f };
             var unitIndex = 0;
             foreach (var unit in UnitCatalog.All)
             {
-                var anchorY = unitAnchors[unitIndex];
+                var anchorY = GameUiConstants.SidebarUnitsFirstAnchor -
+                              unitIndex * GameUiConstants.SidebarUnitsRowSpacing;
                 var button = UiButtonFactory.CreateCompactButton(
                     legendPanel,
                     $"Unit_{unit.UnitId}",
@@ -269,7 +270,7 @@ namespace BastionUA.UI
                 unitIndex++;
             }
 
-            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, 0.26f);
+            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, GameUiConstants.SidebarUpgradesTitleAnchor);
 
             var upgradeIndex = 0;
             foreach (var upgrade in UpgradeCatalog.All)
