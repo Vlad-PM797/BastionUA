@@ -46,3 +46,8 @@
 - Час сесії: ___ хв
 - Дійшов до prestige? так / ні / не знаю
 - Скріншот або коротке відео (якщо є)
+
+### Metrics file (optional, для dev)
+Після закриття гри локально зберігається `bastionua_playtest_metrics.json` у persistent data.  
+Windows: `%USERPROFILE%\AppData\LocalLow\<Company>\<Product>\`  
+Можна надіслати файл разом із feedback — допоможе з session length і battles.

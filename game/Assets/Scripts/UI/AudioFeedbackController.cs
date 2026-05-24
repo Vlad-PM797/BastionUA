@@ -22,32 +22,38 @@ namespace BastionUA.UI
                 _audioSource.playOnAwake = false;
                 _audioSource.volume = GameConstants.SfxMasterVolume;
 
-                _tapClip = ProceduralToneGenerator.CreateTone(
+                _tapClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxTapResourceName,
                     GameConstants.SfxTapFrequencyHz,
                     GameConstants.SfxTapDurationSeconds,
                     GameConstants.SfxTapVolume);
-                _battleVictoryClip = ProceduralToneGenerator.CreateTone(
+                _battleVictoryClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxVictoryResourceName,
                     GameConstants.SfxVictoryFrequencyHz,
                     GameConstants.SfxVictoryDurationSeconds,
                     GameConstants.SfxVictoryVolume);
-                _battleDefeatClip = ProceduralToneGenerator.CreateTone(
+                _battleDefeatClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxDefeatResourceName,
                     GameConstants.SfxDefeatFrequencyHz,
                     GameConstants.SfxDefeatDurationSeconds,
                     GameConstants.SfxDefeatVolume);
-                _eventClip = ProceduralToneGenerator.CreateTone(
+                _eventClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxEventResourceName,
                     GameConstants.SfxEventFrequencyHz,
                     GameConstants.SfxEventDurationSeconds,
                     GameConstants.SfxEventVolume);
-                _upgradeClip = ProceduralToneGenerator.CreateTone(
+                _upgradeClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxUpgradeResourceName,
                     GameConstants.SfxUpgradeFrequencyHz,
                     GameConstants.SfxUpgradeDurationSeconds,
                     GameConstants.SfxUpgradeVolume);
-                _prestigeClip = ProceduralToneGenerator.CreateTone(
+                _prestigeClip = SfxClipResolver.LoadOrCreateTone(
+                    GameConstants.SfxPrestigeResourceName,
                     GameConstants.SfxPrestigeFrequencyHz,
                     GameConstants.SfxPrestigeDurationSeconds,
                     GameConstants.SfxPrestigeVolume);
 
-                Debug.Log("[AudioFeedbackController] Procedural SFX ready.");
+                Debug.Log("[AudioFeedbackController] SFX ready (Resources or procedural fallback).");
             }
             catch (System.Exception exception)
             {

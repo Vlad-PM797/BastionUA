@@ -16,6 +16,7 @@ namespace BastionUA.Bootstrap
         private ProgressionService _progressionService;
         private PrestigeService _prestigeService;
         private EventLogService _eventLogService;
+        private PlaytestMetricsService _playtestMetricsService;
         private EventPopupController _eventPopupController;
         private BattleResultPopupController _battleResultPopupController;
         private AudioFeedbackController _audioFeedbackController;
@@ -60,11 +61,13 @@ namespace BastionUA.Bootstrap
             _progressionService = new ProgressionService();
             _prestigeService = new PrestigeService();
             _eventLogService = new EventLogService();
+            _playtestMetricsService = new PlaytestMetricsService();
 
             _gameState = _saveService.LoadOrCreate();
             _gameState.Normalize();
             EnsureHud();
             _eventLogService.AddEntry("Session started.");
+            _playtestMetricsService.StartSession();
 
             Debug.Log("[GameBootstrap] Initialized.");
             LogCurrentState();
@@ -110,6 +113,7 @@ namespace BastionUA.Bootstrap
             {
                 _saveService.Save(_gameState);
                 _eventLogService.AddEntry($"Event: {eventDefinition.Title} -> {choice.Label}");
+                _playtestMetricsService.RecordEvent();
                 _audioFeedbackController?.PlayEventChoice();
                 Debug.Log(
                     $"[GameBootstrap] Event choice applied: {eventDefinition.EventId}/{choice.ChoiceId}. " +
@@ -176,6 +180,7 @@ namespace BastionUA.Bootstrap
             var result = _battleService.Simulate(_gameState, region, modifiers);
             _gameState.TotalBattles++;
             MarkOnboardingSeen();
+            _playtestMetricsService.RecordBattle();
             _saveService.Save(_gameState);
             _eventLogService.AddEntry(
                 result.IsVictory
@@ -210,6 +215,7 @@ namespace BastionUA.Bootstrap
             {
                 _saveService.Save(_gameState);
                 _eventLogService.AddEntry($"Upgrade: {upgradeId}");
+                _playtestMetricsService.RecordUpgrade();
                 _audioFeedbackController?.PlayUpgrade();
                 LogCurrentState();
             }
@@ -234,6 +240,7 @@ namespace BastionUA.Bootstrap
 
             _saveService.Save(_gameState);
             _eventLogService.AddEntry($"Prestige L{_gameState.PrestigeLevel} activated.");
+            _playtestMetricsService.RecordPrestige();
             _audioFeedbackController?.PlayPrestige();
             LogCurrentState();
             TryQueueNextEvent(EventTriggerMode.OnSessionStart);
@@ -307,7 +314,13 @@ namespace BastionUA.Bootstrap
 
         private void OnApplicationQuit()
         {
+            _playtestMetricsService?.EndSession(_gameState);
             _saveService.Save(_gameState);
+        }
+
+        private void OnDestroy()
+        {
+            _playtestMetricsService?.EndSession(_gameState);
         }
 
         private void TryQueueNextEvent(EventTriggerMode triggerMode)

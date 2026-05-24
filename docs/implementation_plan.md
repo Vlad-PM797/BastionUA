@@ -4,6 +4,7 @@
 Master plan: [`docs/post_solo_plan.md`](post_solo_plan.md)
 
 ## Phase A — Playtest
+- [x] Local metrics + SFX Resources hook
 - [ ] Demo zip/APK → 3–5 тестерів
 - [ ] [`playtest_guide_ua.md`](playtest_guide_ua.md) + [`playtest_feedback_form.md`](playtest_feedback_form.md)
 - [ ] Top-3 fixes → [`playtest_backlog.md`](playtest_backlog.md) → RC-2

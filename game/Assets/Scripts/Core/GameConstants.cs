@@ -69,5 +69,16 @@ namespace BastionUA.Core
         public const float SfxPrestigeFrequencyHz = 920f;
         public const float SfxPrestigeDurationSeconds = 0.28f;
         public const float SfxPrestigeVolume = 0.32f;
+
+        public const string SfxResourcesFolder = "Audio";
+        public const string SfxTapResourceName = "sfx_tap";
+        public const string SfxVictoryResourceName = "sfx_victory";
+        public const string SfxDefeatResourceName = "sfx_defeat";
+        public const string SfxEventResourceName = "sfx_event";
+        public const string SfxUpgradeResourceName = "sfx_upgrade";
+        public const string SfxPrestigeResourceName = "sfx_prestige";
+
+        public const string PlaytestMetricsFileName = "bastionua_playtest_metrics.json";
+        public const int PlaytestMetricsMaxSessions = 20;
     }
 }
