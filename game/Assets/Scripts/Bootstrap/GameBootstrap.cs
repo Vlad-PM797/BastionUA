@@ -281,6 +281,21 @@ namespace BastionUA.Bootstrap
             Debug.Log("[GameBootstrap] Manual save triggered.");
         }
 
+        public void QuitApplication()
+        {
+            try
+            {
+                _playtestMetricsService?.EndSession(_gameState);
+                _saveService.Save(_gameState);
+                Debug.Log("[GameBootstrap] Quit requested.");
+                Application.Quit();
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogError($"[GameBootstrap] Quit failed: {exception}");
+            }
+        }
+
         public void ResetProgress()
         {
             try

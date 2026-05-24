@@ -11,6 +11,7 @@ namespace BastionUA.Core
         public const string ButtonTap = "+ Ammo (Tap)";
         public const string ButtonBattle = "Battle";
         public const string ButtonResetSave = "Reset Save";
+        public const string ButtonQuit = "\u0412\u0438\u0445\u0456\u0434";
         public const string ButtonPrestige = "Prestige";
         public const string LabelEventLog = "Log";
         public const string LabelPrestige = "Prestige";

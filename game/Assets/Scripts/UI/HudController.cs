@@ -93,7 +93,15 @@ namespace BastionUA.UI
             _prestigeText = CreateStatText(topBar.transform, "PrestigeText", new Vector2(0.24f, 0.5f), $"{GameUiConstants.LabelPrestige}: 0");
             _prestigeText.fontSize = GameUiConstants.BaseFontSize;
             _moraleText = CreateStatText(topBar.transform, "MoraleText", new Vector2(0.42f, 0.5f), $"{GameUiConstants.LabelMorale}: --");
-            _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.68f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
+            _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.60f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
+            CreateActionButton(
+                topBar.transform,
+                "QuitButton",
+                GameUiConstants.ButtonQuit,
+                new Vector2(0.96f, 0.5f),
+                OnQuitClicked,
+                false,
+                new Vector2(120f, 48f));
 
             BuildObjectiveBar(canvasObject.transform);
             BuildLegendPanel(canvasObject.transform);
@@ -333,6 +341,11 @@ namespace BastionUA.UI
         private void OnResetClicked()
         {
             _bootstrap?.ResetProgress();
+        }
+
+        private void OnQuitClicked()
+        {
+            _bootstrap?.QuitApplication();
         }
 
         private void OnRegionSelected(string regionId)
