@@ -122,6 +122,8 @@ namespace BastionUA.UI
             StretchFullScreen(selectionRect, -MapUiConstants.MapMarkerRingThickness * 2.4f);
             selectionObject.GetComponent<Image>().color = GameVisualPalette.MapSelectionRing;
             selectionObject.SetActive(false);
+            var selectionPulse = selectionObject.AddComponent<UiSelectionPulse>();
+            selectionPulse.Bind(selectionObject.GetComponent<Image>());
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
             labelObject.transform.SetParent(markerObject.transform, false);

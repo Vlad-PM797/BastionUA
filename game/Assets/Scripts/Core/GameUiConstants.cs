@@ -73,8 +73,23 @@ namespace BastionUA.Core
         public const float BottomBarHeight = 96f;
         public const int BaseFontSize = 22;
         public const int TitleFontSize = 26;
+        public const int StatValueFontSize = 24;
+        public const int ObjectiveFontSize = 20;
+        public const int SectionTitleFontSize = 18;
+        public const int CompactFontSize = 16;
+        public const float StatTextWidth = 220f;
+        public const float SelectedStatTextWidth = 360f;
+        public const float ObjectiveTextWidth = 1680f;
         public const float AccentStripeHeight = 4f;
         public const float SidePanelAccentWidth = 4f;
+
+        public const float ButtonPressedScale = 0.97f;
+        public const float TapFlashDurationSeconds = 0.14f;
+        public const float MarkerPulseSpeed = 3.5f;
+        public const float MarkerPulseMinAlpha = 0.35f;
+        public const float MarkerPulseMaxAlpha = 1f;
+        public const float ButtonHighlightBlend = 0.12f;
+        public const float ButtonPressedBlend = 0.2f;
 
         public static Color PanelBackground => GameVisualPalette.SidePanel;
         public static Color TextPrimary => GameVisualPalette.TextPrimary;

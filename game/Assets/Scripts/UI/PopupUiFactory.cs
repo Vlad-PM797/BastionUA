@@ -159,6 +159,7 @@ namespace BastionUA.UI
 
             var button = frameObject.GetComponent<Button>();
             button.targetGraphic = fillObject.GetComponent<Image>();
+            UiButtonFactory.ApplyColorBlock(button, fillColor);
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
             labelObject.transform.SetParent(frameObject.transform, false);

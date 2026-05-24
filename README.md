@@ -52,8 +52,8 @@ Verification (Editor **закритий**):
 ## Solo roadmap (активний план)
 
 1. **Playtest** — 3–5 людей → top-3 fixes → RC-2 ([`post_solo_plan.md`](./docs/post_solo_plan.md))  
-2. **Demo package** — відео 60–90 с + one-pager  
-3. **Solo v2** — JSON events, +content, SFX, mobile polish, closed beta  
+2. **Visual v1** — Unity polish → key assets ([`solo_visual_v1_design.md`](./docs/solo_visual_v1_design.md))  
+3. **Solo v2** — JSON events, +content, closed beta  
 
 **Не в scope solo зараз:** IAP, ads, Battle Pass, backend, Telegram Mini App, team MVP launch.
 
@@ -68,6 +68,7 @@ Verification (Editor **закритий**):
 | [Playtest Guide](./docs/playtest_guide_ua.md) | Інструкція для тестерів |
 | [Playtest Feedback](./docs/playtest_feedback_form.md) | 5 питань |
 | [Demo One-Pager](./docs/demo_one_pager_ua.md) | Короткий опис для demo (free, no monetization) |
+| [Solo Visual v1 Design](./docs/solo_visual_v1_design.md) | Unity polish (A) + key assets (D) |
 | [Solo Version Plan](./docs/08_solo_version_plan.md) | Реалістичний solo scope |
 | Week 1–10 checkpoints | [`docs/week1_checkpoint.md`](./docs/week1_checkpoint.md) … [`week10`](./docs/week10_checkpoint.md) |
 
