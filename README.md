@@ -1,131 +1,111 @@
 # Bastion UA
 
-*Idle-strategy симулятор оборони України з 24.02.2022, де монетизація підтримує реальні фонди ЗСУ.*
+*Безкоштовний idle-strategy про оборону України з 24.02.2022 — solo prototype, без monetization.*
 
 ---
 
-## Суть проєкту
+## Поточний статус (solo · free)
 
-**Жанр**: Mobile Idle-Strategy + Tower Defense + Grand Strategy lite
-**Платформи**: iOS · Android · Telegram Mini App · (Y2: Steam + Web)
-**Аудиторія**: UA + UA-діаспора + західні прихильники України
-**Модель**: F2P з IAP + rewarded ads + Battle Pass + опційний Infinity Pass
-**Соціальна місія**: **20% чистого прибутку → фонди ЗСУ**
+| | |
+|---|---|
+| **Фаза** | Post-solo playtest → Solo v2 |
+| **Модель** | **Free** · no ads · no IAP · no in-game donations |
+| **Прототип** | Week 1–10 ✅ · [`game/`](./game/) Unity 6000.4.4f1 |
+| **GitHub** | https://github.com/Vlad-PM797/BastionUA |
+
+**Жанр:** Idle-Strategy + auto-battle lite  
+**Платформи зараз:** Windows demo zip · Android dev APK  
+**Аудиторія:** UA + діаспора · playtesters · indie/community
+
+---
+
+## Що вже працює в build
+
+- Карта UA (4 регіони) + tap/auto resources + auto-battle  
+- 4 story events: Hostomel → Chornobaivka → Irpin → Kharkiv  
+- Units, upgrades, event log, prestige (L5)  
+- Save/load · кнопка **«Вихід»** (save перед закриттям)  
+- Demo zip для зовнішніх тестерів  
+
+Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
+
+---
+
+## Завантажити / зібрати demo
+
+| Menu (Unity) | Output |
+|--------------|--------|
+| **Build Windows Release** | `game/Builds/WindowsRelease/` |
+| **Package Windows Release Demo** | `game/Builds/BastionUA-Windows-demo.zip` |
+| **Build Android Dev** | `game/Builds/Android/BastionUA-dev.apk` |
+
+Playtest: [`docs/playtest_guide_ua.md`](./docs/playtest_guide_ua.md) · One-pager: [`docs/demo_one_pager_ua.md`](./docs/demo_one_pager_ua.md)
+
+Verification (Editor **закритий**):
+
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\6000.4.4f1\Editor\Unity.exe" -batchmode -nographics -quit -projectPath "E:\BastionUA\game" -executeMethod BastionUA.EditorTools.UnityVerificationRunner.RunAll
+```
+
+---
+
+## Solo roadmap (активний план)
+
+1. **Playtest** — 3–5 людей → top-3 fixes → RC-2 ([`post_solo_plan.md`](./docs/post_solo_plan.md))  
+2. **Demo package** — відео 60–90 с + one-pager  
+3. **Solo v2** — JSON events, +content, SFX, mobile polish, closed beta  
+
+**Не в scope solo зараз:** IAP, ads, Battle Pass, backend, Telegram Mini App, team MVP launch.
 
 ---
 
 ## Документація
 
+### Прототип і playtest
+| Документ | Зміст |
+|----------|--------|
+| [Post-Solo Plan](./docs/post_solo_plan.md) | Playtest → demo → solo v2 |
+| [Playtest Guide](./docs/playtest_guide_ua.md) | Інструкція для тестерів |
+| [Playtest Feedback](./docs/playtest_feedback_form.md) | 5 питань |
+| [Demo One-Pager](./docs/demo_one_pager_ua.md) | Короткий опис для demo (free, no monetization) |
+| [Solo Version Plan](./docs/08_solo_version_plan.md) | Реалістичний solo scope |
+| Week 1–10 checkpoints | [`docs/week1_checkpoint.md`](./docs/week1_checkpoint.md) … [`week10`](./docs/week10_checkpoint.md) |
+
+### GDD і дизайн
 | # | Документ | Зміст |
-|---|---|---|
-| 01 | [MVP Roadmap](./docs/01_mvp_roadmap.md) | 6-місячний план по тижнях, команда, бюджет $173K |
-| 02 | [UI Wireframes](./docs/02_ui_wireframes.md) | 12 екранів: ASCII-вайрфрейми, логіка, стиль |
-| 03 | [Pitch Deck](./docs/03_pitch_deck.md) | 15 слайдів для інвесторів + додатки |
-| 04 | [Unit Economics](./docs/04_unit_economics.md) | ARPU/LTV/CAC/3-річний P&L, сценарії |
-| 05 | [Legal](./docs/05_legal.md) | Юр-структура, ліцензії бригад, App Store compliance |
-| — | [Week 1 Checkpoint](./docs/week1_checkpoint.md) | ✅ Core loop, HUD, Hostomel |
-| — | [Week 2 Checkpoint](./docs/week2_checkpoint.md) | ✅ Events pipeline, map HUD, Chornobaivka |
-| — | [Week 3 Checkpoint](./docs/week3_checkpoint.md) | ✅ Irpin event, objectives, reset save, build |
-| — | [Week 4 Checkpoint](./docs/week4_checkpoint.md) | ✅ Battle popup, units, upgrades |
-| — | [Week 5 Checkpoint](./docs/week5_checkpoint.md) | ✅ Map v2, Kharkiv, battle balance |
-| — | [Week 7 Checkpoint](./docs/week7_checkpoint.md) | ✅ UA palette, map PNG, HUD reskin |
-| — | [Week 8 Checkpoint](./docs/week8_checkpoint.md) | ✅ Popup polish, release build, demo freeze |
-| — | [Week 9 Checkpoint](./docs/week9_checkpoint.md) | ✅ Prestige, SFX stub, event log |
-| — | [Week 10 Checkpoint](./docs/week10_checkpoint.md) | ✅ Android build, demo zip, UX hints |
-| — | [Post-Solo Plan](./docs/post_solo_plan.md) | 🔄 Playtest → demo → MVP gate |
-
-### Unity prototype (Week 10 ✅ → Post-solo)
-- Проєкт: [`game/`](./game/) — Unity 6000.4.4f1
-- Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
-- **GitHub**: https://github.com/Vlad-PM797/BastionUA
-
-#### Share builds
-| Menu | Output |
-|------|--------|
-| **Build Windows Release** | `Builds/WindowsRelease/` |
-| **Package Windows Release Demo** | `Builds/BastionUA-Windows-demo.zip` |
-| **Build Android Dev** | `Builds/Android/BastionUA-dev.apk` |
-| **Build Windows Dev** | `Builds/Windows/` |
-
-#### Post-solo (зараз)
-1. Зібрати demo zip → 3–5 playtesters — [`docs/playtest_guide_ua.md`](./docs/playtest_guide_ua.md)
-2. Top-3 fixes — [`docs/playtest_backlog.md`](./docs/playtest_backlog.md)
-3. Demo video + one-pager — [`docs/post_solo_plan.md`](./docs/post_solo_plan.md)
-4. Team MVP gate — [`docs/mvp_gap_analysis.md`](./docs/mvp_gap_analysis.md)
+|---|----------|--------|
+| — | [GDD v0.1](./docs/00_gdd_v0.1.md) | Game design (канон для контенту) |
+| 02 | [UI Wireframes](./docs/02_ui_wireframes.md) | Екрани, логіка UI |
 
 ---
 
-## TL;DR
+## Future vision (team-scale · не поточний solo план)
 
-### Продукт
-- Реальна карта України + окуповані території
-- Старт: 24 лютого 2022
-- Гра за ЗСУ
-- 10–15 бригад (партнерства з реальними: 72, 93, 80, 47, Азов, 3 ОШБр та ін.)
-- Auto-battle на ключових напрямках
-- Tech Tree: сухопут + повітря + дрони + МЗС + ГУР
-- Історичні івенти з реальних подій (Гостомель, Чорнобаївка, Херсонський контрнаступ, Курська операція)
-- Prestige через "Ставку ВГК" — permanent апгрейди
+Архівні матеріали для **можливого** масштабування з командою та фінансуванням. **Не описують те, що зараз будується solo.**
 
-### Ключові цифри
-- **MVP**: 6 міс, ~$173K, команда 7–9 FTE
-- **Soft-launch**: UA/PL/EE, 5K DAU target
-- **Y3 projection**: 500K MAU, $7.5M revenue, $900K → ЗСУ
-- **LTV:CAC**: 7.3× (base case)
-- **Donation 3-year total**: ~$1.48M carve-out + $1–3M прямих → **до $4M на ЗСУ**
+| # | Документ | Примітка |
+|---|----------|----------|
+| 01 | [MVP Roadmap](./docs/01_mvp_roadmap.md) | 6 міс · ~$173K · 7–9 FTE |
+| 03 | [Pitch Deck](./docs/03_pitch_deck.md) | Інвесторський pitch |
+| 04 | [Unit Economics](./docs/04_unit_economics.md) | ARPU/LTV/CAC |
+| 05 | [Legal](./docs/05_legal.md) | Compliance, бригади, stores |
 
-### Фінансування
-- Seed ask: **$250K**
-- Co-funding sources: Ukrainian Cultural Foundation, Creative Europe, House of Europe, USAID, приватні меценати
+У тій vision згадуються F2P, IAP, ads, donation carve-out, soft-launch 5K DAU — **це опція на майбутнє, не commit solo-розробки.**
 
 ---
 
-## Наступні кроки
+## Ключові ризики (solo)
 
-### Immediate (тиждень 1-2)
-1. Фіналізувати GDD v0.1 (на основі цих доків)
-2. Скласти команду-ядро (founder + 2 key hires)
-3. Landing page з pre-registration
-4. 3 перших LOI з фондами ЗСУ (outreach)
-5. Реєстрація ТОВ + FO​Пи
-
-### Short-term (міс 1-2)
-6. Зібрати перші $25–50K (грант UCF + private angel)
-7. MVP dev kickoff
-8. 3-4 MOU з бригадами (LOI → MOU)
-9. Legal: TM, EULA, Privacy
-10. Community: Discord, Telegram channel, X-акаунт
-
-### Mid-term (міс 3-6)
-11. Closed alpha → beta
-12. Demo trailer → PR-хвиля (24.08 або 14.10 — День Захисників)
-13. Pitch до strategic інвесторів
-14. Soft-launch (Q2 2026)
-
----
-
-## Ключові ризики
-
-1. **Етичний**: "гра на крові" — мітигація через прозорість, консультанта, donation carve-out
-2. **App Store policy**: IAP vs donations — мітигація через зовнішні linki на фонди
-3. **PR-атаки з рф**: DDoS, coordinated-review-bombing — Cloudflare, модерація
-4. **Кінець війни раніше ніж Y2**: гра = історичний меморіал, sustains value
-5. **Scope creep**: жорсткий feature-freeze на MVP, stable увага до core loop
-
----
-
-## Цитата для інтро
-
-> "Ми робимо першу гру, де підтримка ЗСУ — це не окремий акт, а частина дозвілля мільйонів людей."
+1. **Scope creep** — тримати Solo v2 scope; не тягнути team MVP в один dev cycle  
+2. **Етичний** — стилізований контекст, без likeness/імен; playtest feedback  
+3. **Вигорання** — part-time rhythm, feature freeze після playtest wave  
 
 ---
 
 ## Контакти
 
-- [Ім'я]: [email] · [Telegram]
+- [Ім'я]: [email] · [Telegram]  
 - Website: _TBD_
-- Discord: _TBD_
-- Twitter/X: _TBD_
 
 ---
 
