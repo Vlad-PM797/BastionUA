@@ -13,10 +13,13 @@ namespace BastionUA.Core
         public static readonly Color MapFrame = Hex("#2A3D52", 0.85f);
         public static readonly Color MapBackdrop = Hex("#070B10", 0.72f);
 
-        public static readonly Color TextPrimary = Hex("#F2F6FA");
-        public static readonly Color TextMuted = Hex("#9FB0C3");
-        public static readonly Color TextObjective = Hex("#DDE8F4");
+        public static readonly Color TextPrimary = Hex("#FFFFFF");
+        public static readonly Color TextMuted = Hex("#C5D4E4");
+        public static readonly Color TextObjective = Hex("#E8F0FA");
         public static readonly Color TextAccent = Hex("#FFD700");
+        public static readonly Color TextOnPrimaryButton = Hex("#FFFFFF");
+        public static readonly Color TextTitleVictory = Hex("#FFD700");
+        public static readonly Color TextTitleDefeat = Hex("#FF7070");
 
         public static readonly Color AccentBlue = Hex("#005BBB");
         public static readonly Color AccentYellow = Hex("#FFD700");
@@ -24,7 +27,7 @@ namespace BastionUA.Core
 
         public static readonly Color ButtonNeutral = Hex("#1A2838");
         public static readonly Color ButtonNeutralBorder = Hex("#2E445C");
-        public static readonly Color ButtonPrimary = Hex("#1E4D7A");
+        public static readonly Color ButtonPrimary = Hex("#005BBB");
         public static readonly Color ButtonPrimaryBorder = Hex("#FFD700");
         public static readonly Color ButtonSelected = Hex("#2A6798");
         public static readonly Color ButtonSelectedBorder = Hex("#FFD700");
@@ -42,8 +45,9 @@ namespace BastionUA.Core
         public static readonly Color MapSelectionRing = Hex("#FFD700");
 
         public static readonly Color EventOverlay = Hex("#05080E", 0.78f);
-        public static readonly Color EventPanel = Hex("#121C28", 0.98f);
-        public static readonly Color EventChoice = Hex("#1A3550");
+        public static readonly Color EventPanel = Hex("#0F1722", 0.98f);
+        public static readonly Color EventChoice = Hex("#1E3550");
+        public static readonly Color PopupFrame = Hex("#FFD700");
 
         private static Color Hex(string hex, float alphaOverride = 1f)
         {

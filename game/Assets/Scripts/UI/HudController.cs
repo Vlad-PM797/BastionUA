@@ -477,51 +477,52 @@ namespace BastionUA.UI
             Action onClick,
             bool isPrimary)
         {
-            var buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-            buttonObject.transform.SetParent(parent, false);
-
-            var rectTransform = buttonObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = anchor;
-            rectTransform.anchorMax = anchor;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(280f, 56f);
-
-            buttonObject.GetComponent<Image>().color = isPrimary
+            var buttonSize = new Vector2(280f, 56f);
+            var frameColor = isPrimary
+                ? GameVisualPalette.ButtonPrimaryBorder
+                : GameVisualPalette.ButtonNeutralBorder;
+            var fillColor = isPrimary
                 ? GameVisualPalette.ButtonPrimary
                 : GameVisualPalette.ButtonNeutral;
-            var button = buttonObject.GetComponent<Button>();
+            var labelColor = isPrimary
+                ? GameVisualPalette.TextOnPrimaryButton
+                : GameVisualPalette.TextPrimary;
+
+            var frameObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            frameObject.transform.SetParent(parent, false);
+
+            var frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.anchorMin = anchor;
+            frameRect.anchorMax = anchor;
+            frameRect.pivot = new Vector2(0.5f, 0.5f);
+            frameRect.sizeDelta = buttonSize;
+            frameObject.GetComponent<Image>().color = frameColor;
+
+            var fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            fillObject.transform.SetParent(frameObject.transform, false);
+            var fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            var inset = GameUiConstants.ButtonFrameInset;
+            fillRect.offsetMin = new Vector2(inset, inset);
+            fillRect.offsetMax = new Vector2(-inset, -inset);
+            fillObject.GetComponent<Image>().color = fillColor;
+
+            var button = frameObject.GetComponent<Button>();
+            button.targetGraphic = fillObject.GetComponent<Image>();
             button.onClick.AddListener(() => onClick());
 
-            if (isPrimary)
-            {
-                CreateButtonBorder(buttonObject.transform, GameVisualPalette.ButtonPrimaryBorder);
-            }
-
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
-            labelObject.transform.SetParent(buttonObject.transform, false);
+            labelObject.transform.SetParent(frameObject.transform, false);
             StretchFullScreen(labelObject.GetComponent<RectTransform>());
             ConfigureText(
                 labelObject.GetComponent<Text>(),
                 label,
                 GameUiConstants.BaseFontSize,
                 TextAnchor.MiddleCenter,
-                isPrimary ? GameVisualPalette.TextAccent : GameVisualPalette.TextPrimary);
+                labelColor);
 
             return button;
-        }
-
-        private static void CreateButtonBorder(Transform parent, Color borderColor)
-        {
-            var borderObject = new GameObject("Border", typeof(RectTransform), typeof(Image));
-            borderObject.transform.SetParent(parent, false);
-            borderObject.transform.SetAsFirstSibling();
-
-            var rectTransform = borderObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = new Vector2(-2f, -2f);
-            rectTransform.offsetMax = new Vector2(2f, 2f);
-            borderObject.GetComponent<Image>().color = borderColor;
         }
 
         private static void StretchFullScreen(RectTransform rectTransform)

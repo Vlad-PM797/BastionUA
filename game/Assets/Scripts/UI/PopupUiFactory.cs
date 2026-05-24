@@ -47,17 +47,21 @@ namespace BastionUA.UI
 
         public static GameObject CreateStyledPanel(Transform parent, float width, float height)
         {
+            var frameObject = new GameObject("PopupFrame", typeof(RectTransform), typeof(Image));
+            frameObject.transform.SetParent(parent, false);
+
+            var frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.anchorMin = new Vector2(0.5f, 0.5f);
+            frameRect.anchorMax = new Vector2(0.5f, 0.5f);
+            frameRect.pivot = new Vector2(0.5f, 0.5f);
+            frameRect.sizeDelta = new Vector2(width, height);
+            frameObject.GetComponent<Image>().color = GameVisualPalette.PopupFrame;
+
             var panelObject = new GameObject("PopupPanel", typeof(RectTransform), typeof(Image));
-            panelObject.transform.SetParent(parent, false);
-
-            var panelRect = panelObject.GetComponent<RectTransform>();
-            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
-            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.sizeDelta = new Vector2(width, height);
-
-            CreatePanelBorder(panelObject.transform);
+            panelObject.transform.SetParent(frameObject.transform, false);
+            StretchWithInset(panelObject.GetComponent<RectTransform>(), GameUiConstants.PopupFrameInset);
             panelObject.GetComponent<Image>().color = GameVisualPalette.EventPanel;
+
             CreatePanelAccentStripe(panelObject.transform);
 
             return panelObject;
@@ -79,7 +83,8 @@ namespace BastionUA.UI
                 sizeDelta,
                 GameUiConstants.EventTitleFontSize,
                 TextAnchor.UpperCenter,
-                color);
+                color,
+                addShadow: true);
         }
 
         public static Text CreateBody(
@@ -97,25 +102,26 @@ namespace BastionUA.UI
                 sizeDelta,
                 GameUiConstants.EventBodyFontSize,
                 TextAnchor.UpperCenter,
-                GameVisualPalette.TextObjective);
+                GameVisualPalette.TextPrimary,
+                addShadow: false);
         }
 
         public static Button CreatePrimaryButton(Transform parent, string name, string label, Vector2 anchor)
         {
-            return CreateButton(
+            return CreateFramedButton(
                 parent,
                 name,
                 label,
                 anchor,
                 new Vector2(420f, 56f),
                 GameVisualPalette.ButtonPrimary,
-                GameVisualPalette.ButtonPrimaryBorder,
-                GameVisualPalette.TextAccent);
+                GameVisualPalette.PopupFrame,
+                GameVisualPalette.TextOnPrimaryButton);
         }
 
         public static Button CreateChoiceButton(Transform parent, string name, string label, Vector2 anchor)
         {
-            return CreateButton(
+            return CreateFramedButton(
                 parent,
                 name,
                 label,
@@ -126,30 +132,36 @@ namespace BastionUA.UI
                 GameVisualPalette.TextPrimary);
         }
 
-        private static Button CreateButton(
+        private static Button CreateFramedButton(
             Transform parent,
             string name,
             string label,
             Vector2 anchor,
             Vector2 size,
             Color fillColor,
-            Color borderColor,
+            Color frameColor,
             Color labelColor)
         {
-            var buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-            buttonObject.transform.SetParent(parent, false);
+            var frameObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            frameObject.transform.SetParent(parent, false);
 
-            var rectTransform = buttonObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = anchor;
-            rectTransform.anchorMax = anchor;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = size;
+            var frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.anchorMin = anchor;
+            frameRect.anchorMax = anchor;
+            frameRect.pivot = new Vector2(0.5f, 0.5f);
+            frameRect.sizeDelta = size;
+            frameObject.GetComponent<Image>().color = frameColor;
 
-            CreateButtonBorder(buttonObject.transform, borderColor);
-            buttonObject.GetComponent<Image>().color = fillColor;
+            var fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            fillObject.transform.SetParent(frameObject.transform, false);
+            StretchWithInset(fillObject.GetComponent<RectTransform>(), GameUiConstants.ButtonFrameInset);
+            fillObject.GetComponent<Image>().color = fillColor;
+
+            var button = frameObject.GetComponent<Button>();
+            button.targetGraphic = fillObject.GetComponent<Image>();
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
-            labelObject.transform.SetParent(buttonObject.transform, false);
+            labelObject.transform.SetParent(frameObject.transform, false);
             StretchFullScreen(labelObject.GetComponent<RectTransform>());
 
             var labelText = labelObject.GetComponent<Text>();
@@ -159,21 +171,7 @@ namespace BastionUA.UI
             labelText.color = labelColor;
             labelText.alignment = TextAnchor.MiddleCenter;
 
-            return buttonObject.GetComponent<Button>();
-        }
-
-        private static void CreatePanelBorder(Transform parent)
-        {
-            var borderObject = new GameObject("PanelBorder", typeof(RectTransform), typeof(Image));
-            borderObject.transform.SetParent(parent, false);
-            borderObject.transform.SetAsFirstSibling();
-
-            var rectTransform = borderObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = new Vector2(-GameUiConstants.PopupBorderExpand, -GameUiConstants.PopupBorderExpand);
-            rectTransform.offsetMax = new Vector2(GameUiConstants.PopupBorderExpand, GameUiConstants.PopupBorderExpand);
-            borderObject.GetComponent<Image>().color = GameVisualPalette.ButtonPrimaryBorder;
+            return button;
         }
 
         private static void CreatePanelAccentStripe(Transform parent)
@@ -190,20 +188,6 @@ namespace BastionUA.UI
             stripeObject.GetComponent<Image>().color = GameVisualPalette.AccentBlue;
         }
 
-        private static void CreateButtonBorder(Transform parent, Color borderColor)
-        {
-            var borderObject = new GameObject("Border", typeof(RectTransform), typeof(Image));
-            borderObject.transform.SetParent(parent, false);
-            borderObject.transform.SetAsFirstSibling();
-
-            var rectTransform = borderObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = new Vector2(-2f, -2f);
-            rectTransform.offsetMax = new Vector2(2f, 2f);
-            borderObject.GetComponent<Image>().color = borderColor;
-        }
-
         private static Text CreateText(
             Transform parent,
             string name,
@@ -212,7 +196,8 @@ namespace BastionUA.UI
             Vector2 sizeDelta,
             int fontSize,
             TextAnchor alignment,
-            Color color)
+            Color color,
+            bool addShadow)
         {
             var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
             textObject.transform.SetParent(parent, false);
@@ -232,6 +217,14 @@ namespace BastionUA.UI
             text.alignment = alignment;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
+
+            if (addShadow)
+            {
+                var outline = textObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0f, 0f, 0f, 0.65f);
+                outline.effectDistance = new Vector2(1f, -1f);
+            }
+
             return text;
         }
 
@@ -241,6 +234,14 @@ namespace BastionUA.UI
             rectTransform.anchorMax = Vector2.one;
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
+        }
+
+        private static void StretchWithInset(RectTransform rectTransform, float inset)
+        {
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = new Vector2(inset, inset);
+            rectTransform.offsetMax = new Vector2(-inset, -inset);
         }
     }
 }

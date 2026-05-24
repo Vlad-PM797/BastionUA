@@ -78,7 +78,9 @@ namespace BastionUA.UI
                 GameUiConstants.BattlePanelHeight);
 
             var title = result.IsVictory ? GameUiConstants.BattleVictoryTitle : GameUiConstants.BattleDefeatTitle;
-            var titleColor = result.IsVictory ? GameVisualPalette.TextAccent : GameVisualPalette.StatusOccupied;
+            var titleColor = result.IsVictory
+                ? GameVisualPalette.TextTitleVictory
+                : GameVisualPalette.TextTitleDefeat;
 
             PopupUiFactory.CreateTitle(
                 panelObject.transform,
