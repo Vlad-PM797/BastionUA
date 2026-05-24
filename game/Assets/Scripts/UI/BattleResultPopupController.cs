@@ -77,6 +77,15 @@ namespace BastionUA.UI
                 GameUiConstants.BattlePanelWidth,
                 GameUiConstants.BattlePanelHeight);
 
+            PopupUiFactory.CreateBattleOutcomeStripe(panelObject.transform, result.IsVictory);
+            PopupUiFactory.CreatePopupIcon(
+                panelObject.transform,
+                "BattlePopupIcon",
+                UiIconKind.Battle,
+                new Vector2(0.5f, 1f),
+                new Vector2(0f, -28f),
+                GameUiConstants.HudBattleIconSize);
+
             var title = result.IsVictory ? GameUiConstants.BattleVictoryTitle : GameUiConstants.BattleDefeatTitle;
             var titleColor = result.IsVictory
                 ? GameVisualPalette.TextTitleVictory

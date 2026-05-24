@@ -59,28 +59,28 @@
 ### Sprint A3 — Map panel depth (2–3 дні)
 | Task | Detail |
 |------|--------|
-| Vignette | Dark gradient overlay on map edges (`MapArtLoader`) |
-| Connection lines | Dashed or lower alpha; animate on region status change (optional) |
-| Labels | Drop shadow under region names |
-| Frame | Inner shadow on `MapFrame` (second inset Image) |
+| Vignette | ✅ Procedural radial overlay (`MapArtLoader`) |
+| Connection lines | ✅ Lower alpha (0.42) |
+| Labels | ✅ Drop shadow on region names |
+| Frame | ✅ Inner shadow inset (`MapFrameInner`) |
 
 ### Sprint A4 — Popup polish (2 дні)
 | Task | Detail |
 |------|--------|
-| `CanvasGroup` fade | Event + Battle popup: 0→1 alpha 0.2s on show |
-| Victory/defeat | Title color + optional stripe (green/red tint) |
-| Overlay click | Block clicks, no accidental dismiss |
+| `CanvasGroup` fade | ✅ `UiPopupFadeIn` 0.2s on event + battle overlay |
+| Victory/defeat | ✅ Green/red outcome stripe + title colors |
+| Overlay click | ✅ Overlay blocks raycasts; dismiss only via buttons |
 
 ### Sprint A5 — Sidebar breathing room (1–2 дні)
 | Task | Detail |
 |------|--------|
-| Upgrade rows | Fixed height, clearer +/- affordance |
-| Event log | Muted background panel, monospace optional |
-| Reset / Quit | Group footer buttons, smaller secondary style |
+| Upgrade rows | ✅ Fixed-height rows + gold-framed `+` buttons |
+| Event log | ✅ Muted inset panel behind log text |
+| Reset footer | ✅ Grouped footer panel, smaller secondary button |
 
 **Phase A DoD:**
-- [ ] Play mode: visible feedback on tap, battle, region select
-- [ ] Popups fade in
+- [x] Play mode: visible feedback on tap, battle, region select
+- [x] Popups fade in
 - [ ] Batchmode verification passes
 - [ ] Screenshot «before/after» у `docs/visual/`
 
@@ -108,9 +108,9 @@
 - Hook: stat bar left of Ammo/Morale text
 
 **Phase D DoD:**
-- [ ] New map visible in Play + Release build
-- [ ] 3 icons in top bar
-- [ ] `MapArtLoader` + README note for asset replacement
+- [x] New map visible in Play + Release build
+- [x] 3 icons in top bar
+- [x] `MapArtLoader` + README note for asset replacement
 
 ---
 

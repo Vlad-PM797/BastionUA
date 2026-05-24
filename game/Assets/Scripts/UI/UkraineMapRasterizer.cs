@@ -5,11 +5,23 @@ namespace BastionUA.UI
 {
     public static class UkraineMapRasterizer
     {
-        public static Texture2D CreateMapTexture(int width, int height)
+        private static readonly MapRegionLayout[] RegionTintLayouts =
+        {
+            MapUiConstants.KyivLayout,
+            MapUiConstants.ChernihivLayout,
+            MapUiConstants.SumyLayout,
+            MapUiConstants.KharkivLayout,
+        };
+
+        public static Texture2D CreateMapTexture(
+            int width,
+            int height,
+            MapTextureQuality quality = MapTextureQuality.Standard)
         {
             var polygon = BuildPixelPolygon(MapUiConstants.UkraineSilhouettePoints, width, height);
             var pixels = new Color32[width * height];
             var transparent = new Color32(0, 0, 0, 0);
+            var isEnhanced = quality == MapTextureQuality.Enhanced;
 
             for (var index = 0; index < pixels.Length; index++)
             {
@@ -18,6 +30,10 @@ namespace BastionUA.UI
 
             var outlinePixels = MapUiConstants.MapSilhouetteBorderPixels * MapUiConstants.MapSilhouetteTextureScale;
             var edgeSoftness = MapUiConstants.MapSilhouetteEdgeSoftnessPixels * MapUiConstants.MapSilhouetteTextureScale;
+            if (isEnhanced)
+            {
+                edgeSoftness *= MapUiConstants.MapV2CoastGlowMultiplier;
+            }
 
             for (var y = 0; y < height; y++)
             {
@@ -30,11 +46,19 @@ namespace BastionUA.UI
                     }
 
                     var normalizedY = y / (float)height;
+                    var normalizedX = x / (float)width;
                     var fillColor = Color.Lerp(
                         GameVisualPalette.MapFillSouth,
                         GameVisualPalette.MapFillNorth,
                         normalizedY);
-                    fillColor = ApplyTerrainNoise(fillColor, x, y, width, height);
+                    fillColor = ApplyTerrainNoise(fillColor, x, y, width, height, isEnhanced);
+
+                    if (isEnhanced)
+                    {
+                        fillColor = ApplyRegionTintHint(fillColor, normalizedX, normalizedY);
+                        fillColor = ApplyCrimeaZoneTint(fillColor, normalizedX, normalizedY);
+                        fillColor = ApplyRadialHighlight(fillColor, normalizedX, normalizedY);
+                    }
 
                     var edgeDistance = GetDistanceToPolygonEdge(polygon, point);
                     pixels[(y * width) + x] = SampleSilhouetteColor(
@@ -43,7 +67,8 @@ namespace BastionUA.UI
                         GameVisualPalette.MapCoast,
                         edgeDistance,
                         outlinePixels,
-                        edgeSoftness);
+                        edgeSoftness,
+                        isEnhanced);
                 }
             }
 
@@ -55,9 +80,12 @@ namespace BastionUA.UI
             return texture;
         }
 
-        public static Sprite CreateMapSprite(int width, int height)
+        public static Sprite CreateMapSprite(
+            int width,
+            int height,
+            MapTextureQuality quality = MapTextureQuality.Standard)
         {
-            var texture = CreateMapTexture(width, height);
+            var texture = CreateMapTexture(width, height, quality);
             return Sprite.Create(
                 texture,
                 new Rect(0f, 0f, width, height),
@@ -65,14 +93,106 @@ namespace BastionUA.UI
                 MapUiConstants.MapSilhouetteTextureScale);
         }
 
-        private static Color ApplyTerrainNoise(Color baseColor, int x, int y, int width, int height)
+        private static Color ApplyTerrainNoise(
+            Color baseColor,
+            int x,
+            int y,
+            int width,
+            int height,
+            bool isEnhanced)
         {
-            var noise = Mathf.PerlinNoise(x * 0.018f, y * 0.018f) * 0.08f - 0.04f;
+            var noiseScale = isEnhanced ? MapUiConstants.MapV2NoiseStrength : 0.08f;
+            var noise = Mathf.PerlinNoise(x * 0.018f, y * 0.018f) * noiseScale - (noiseScale * 0.5f);
             var latitudeShade = (y / (float)height - 0.5f) * 0.06f;
             return new Color(
                 Mathf.Clamp01(baseColor.r + noise + latitudeShade),
                 Mathf.Clamp01(baseColor.g + noise),
                 Mathf.Clamp01(baseColor.b + noise - latitudeShade),
+                baseColor.a);
+        }
+
+        private static Color ApplyRegionTintHint(Color baseColor, float normalizedX, float normalizedY)
+        {
+            var pixel = new Vector2(normalizedX, normalizedY);
+            var tintStrength = 0f;
+            var tintShift = Vector3.zero;
+
+            for (var index = 0; index < RegionTintLayouts.Length; index++)
+            {
+                var layout = RegionTintLayouts[index];
+                var regionPoint = new Vector2(layout.NormalizedX, layout.NormalizedY);
+                var distance = Vector2.Distance(pixel, regionPoint);
+                var influence = Mathf.InverseLerp(MapUiConstants.MapV2RegionTintRadius, 0f, distance);
+                if (influence <= 0f)
+                {
+                    continue;
+                }
+
+                tintStrength = Mathf.Max(tintStrength, influence);
+                tintShift += GetRegionTintVector(layout.RegionId) * influence;
+            }
+
+            if (tintStrength <= 0f)
+            {
+                return baseColor;
+            }
+
+            tintShift /= Mathf.Max(tintStrength, 0.001f);
+            var blend = tintStrength * MapUiConstants.MapV2RegionTintStrength;
+            return new Color(
+                Mathf.Clamp01(baseColor.r + (tintShift.x * blend)),
+                Mathf.Clamp01(baseColor.g + (tintShift.y * blend)),
+                Mathf.Clamp01(baseColor.b + (tintShift.z * blend)),
+                baseColor.a);
+        }
+
+        private static Vector3 GetRegionTintVector(string regionId)
+        {
+            switch (regionId)
+            {
+                case "kyiv":
+                    return new Vector3(0.04f, 0.03f, -0.02f);
+                case "chernihiv":
+                    return new Vector3(-0.02f, 0.04f, 0.02f);
+                case "sumy":
+                    return new Vector3(0.02f, 0.02f, 0.04f);
+                case "kharkiv":
+                    return new Vector3(0.05f, -0.01f, -0.03f);
+                default:
+                    return Vector3.zero;
+            }
+        }
+
+        private static Color ApplyCrimeaZoneTint(Color baseColor, float normalizedX, float normalizedY)
+        {
+            var crimeaCenter = MapUiConstants.MapV2CrimeaZoneCenter;
+            var distance = Vector2.Distance(new Vector2(normalizedX, normalizedY), crimeaCenter);
+            var influence = Mathf.InverseLerp(MapUiConstants.MapV2CrimeaZoneRadius, 0f, distance);
+            if (influence <= 0f)
+            {
+                return baseColor;
+            }
+
+            var crimeaTint = GameVisualPalette.MapCrimeaZoneTint;
+            var blend = influence * MapUiConstants.MapV2CrimeaZoneStrength;
+            return Color.Lerp(baseColor, crimeaTint, blend);
+        }
+
+        private static Color ApplyRadialHighlight(Color baseColor, float normalizedX, float normalizedY)
+        {
+            var center = MapUiConstants.MapV2HighlightCenter;
+            var distance = Vector2.Distance(new Vector2(normalizedX, normalizedY), center);
+            var influence = Mathf.InverseLerp(MapUiConstants.MapV2HighlightRadius, 0f, distance);
+            if (influence <= 0f)
+            {
+                return baseColor;
+            }
+
+            var highlight = influence * MapUiConstants.MapV2HighlightStrength;
+            return new Color(
+                Mathf.Clamp01(baseColor.r + highlight),
+                Mathf.Clamp01(baseColor.g + highlight),
+                Mathf.Clamp01(baseColor.b + highlight),
                 baseColor.a);
         }
 
@@ -95,12 +215,14 @@ namespace BastionUA.UI
             Color coastColor,
             float edgeDistance,
             float outlinePixels,
-            float edgeSoftnessPixels)
+            float edgeSoftnessPixels,
+            bool isEnhanced)
         {
             if (edgeDistance <= outlinePixels)
             {
                 var outlineBlend = edgeDistance / Mathf.Max(outlinePixels, 0.001f);
-                return (Color32)Color.Lerp(outlineColor, coastColor, outlineBlend * 0.35f);
+                var coastMix = isEnhanced ? 0.55f : 0.35f;
+                return (Color32)Color.Lerp(outlineColor, coastColor, outlineBlend * coastMix);
             }
 
             if (edgeDistance <= outlinePixels + edgeSoftnessPixels)

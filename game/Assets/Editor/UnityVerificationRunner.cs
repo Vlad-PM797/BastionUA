@@ -600,6 +600,7 @@ namespace BastionUA.EditorTools
         private static bool VerifyMapArtResource()
         {
             var mapPath = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map.png");
+            var mapV2Path = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map_v2.png");
             if (!File.Exists(mapPath))
             {
                 Debug.LogWarning("[UnityVerification] ukraine_map.png missing; runtime rasterizer fallback will be used.");
@@ -607,6 +608,21 @@ namespace BastionUA.EditorTools
             else
             {
                 Debug.Log("[UnityVerification] ukraine_map.png asset present.");
+            }
+
+            if (!File.Exists(mapV2Path))
+            {
+                Debug.LogWarning("[UnityVerification] ukraine_map_v2.png missing; loader falls back to v1 or rasterizer.");
+            }
+            else
+            {
+                Debug.Log("[UnityVerification] ukraine_map_v2.png asset present.");
+            }
+
+            var iconFolder = Path.Combine(Application.dataPath, "Resources/Art/ui");
+            if (!Directory.Exists(iconFolder))
+            {
+                Debug.LogWarning("[UnityVerification] UI icon folder missing; procedural icon fallback will be used.");
             }
 
             return true;

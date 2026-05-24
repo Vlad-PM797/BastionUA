@@ -46,6 +46,16 @@ namespace BastionUA.Core
         public const int MapSilhouetteBorderPixels = 4;
         public const float MapSilhouetteEdgeSoftnessPixels = 2.5f;
         public const int MapSilhouetteTextureScale = 2;
+        public const float MapV2CoastGlowMultiplier = 1.85f;
+        public const float MapV2HighlightStrength = 0.18f;
+        public const float MapV2NoiseStrength = 0.11f;
+        public const float MapV2RegionTintRadius = 0.14f;
+        public const float MapV2RegionTintStrength = 0.22f;
+        public const float MapV2CrimeaZoneRadius = 0.16f;
+        public const float MapV2CrimeaZoneStrength = 0.28f;
+        public static readonly Vector2 MapV2CrimeaZoneCenter = new Vector2(0.62f, 0.11f);
+        public static readonly Vector2 MapV2HighlightCenter = new Vector2(0.48f, 0.46f);
+        public const float MapV2HighlightRadius = 0.42f;
     }
 
     public readonly struct MapRegionLayout

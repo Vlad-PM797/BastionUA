@@ -25,6 +25,17 @@ Unity Hub → `E:\BastionUA\game` → Boot scene → **Play**
 - Playtest: [`playtest_guide_ua.md`](../docs/playtest_guide_ua.md)
 - MVP gap: [`mvp_gap_analysis.md`](../docs/mvp_gap_analysis.md)
 
+## Art assets (Phase D)
+| Menu | Output |
+|------|--------|
+| **BastionUA → Art → Bake All Art Assets** | map v1/v2 + UI icons |
+| **BastionUA → Art → Bake Ukraine Map V2 PNG** | `Resources/Art/ukraine_map_v2.png` |
+| **BastionUA → Art → Bake UI Icons PNG** | `Resources/Art/ui/icon_*.png` |
+
+Runtime fallback: `MapArtLoader` tries **v2 → v1 → enhanced rasterizer**; icons use **PNG → procedural**.
+
+Replace baked PNGs with external art (same paths/names) and reimport — no code changes needed.
+
 ## Verification (Editor closed)
 ```
 Unity.exe -batchmode -nographics -quit -projectPath game -executeMethod BastionUA.EditorTools.UnityVerificationRunner.RunAll

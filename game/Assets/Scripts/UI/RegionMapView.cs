@@ -23,6 +23,21 @@ namespace BastionUA.UI
             {
                 BuildMarker(mapRoot, region.Layout);
             }
+
+            PositionVignetteBelowMarkers(mapRoot);
+        }
+
+        private static void PositionVignetteBelowMarkers(Transform mapRoot)
+        {
+            var vignette = mapRoot.Find("MapVignette");
+            if (vignette == null)
+            {
+                return;
+            }
+
+            var markerCount = RegionCatalog.All.Count;
+            var insertIndex = Mathf.Max(0, mapRoot.childCount - markerCount);
+            vignette.SetSiblingIndex(insertIndex);
         }
 
         public void Refresh(GameBootstrap bootstrap, GameState state)
@@ -62,6 +77,19 @@ namespace BastionUA.UI
                 MapUiConstants.MapLandmassWidth + 12f,
                 MapUiConstants.MapLandmassHeight + 12f);
             frameObject.GetComponent<Image>().color = GameVisualPalette.MapFrame;
+            frameObject.GetComponent<Image>().raycastTarget = false;
+
+            var frameInnerObject = new GameObject("MapFrameInner", typeof(RectTransform), typeof(Image));
+            frameInnerObject.transform.SetParent(mapPanel.transform, false);
+            var frameInnerRect = frameInnerObject.GetComponent<RectTransform>();
+            frameInnerRect.anchorMin = new Vector2(0.5f, 0.5f);
+            frameInnerRect.anchorMax = new Vector2(0.5f, 0.5f);
+            frameInnerRect.pivot = new Vector2(0.5f, 0.5f);
+            frameInnerRect.sizeDelta = new Vector2(
+                MapUiConstants.MapLandmassWidth + GameUiConstants.MapFrameInnerInsetPixels,
+                MapUiConstants.MapLandmassHeight + GameUiConstants.MapFrameInnerInsetPixels);
+            frameInnerObject.GetComponent<Image>().color = GameVisualPalette.MapFrameInner;
+            frameInnerObject.GetComponent<Image>().raycastTarget = false;
 
             var landmass = new GameObject("MapLandmass", typeof(RectTransform));
             landmass.transform.SetParent(mapPanel.transform, false);
@@ -142,6 +170,7 @@ namespace BastionUA.UI
                 MapUiConstants.MapLabelFontSize,
                 TextAnchor.UpperCenter,
                 GameVisualPalette.TextPrimary);
+            UiTextFactory.AddDropShadow(labelText);
 
             _markers[layout.RegionId] = new MapMarkerUi(buttonImage, ringImage, selectionObject, labelText);
         }
@@ -168,6 +197,7 @@ namespace BastionUA.UI
             rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
 
             connectionObject.GetComponent<Image>().color = MapUiConstants.MapConnectionColor;
+            connectionObject.GetComponent<Image>().raycastTarget = false;
         }
 
         private static GameObject CreatePanel(

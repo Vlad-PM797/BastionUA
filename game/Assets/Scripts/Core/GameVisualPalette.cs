@@ -5,13 +5,19 @@ namespace BastionUA.Core
     public static class GameVisualPalette
     {
         public const string UkraineMapResourcePath = "Art/ukraine_map";
+        public const string UkraineMapV2ResourcePath = "Art/ukraine_map_v2";
+        public const string UiIconAmmoResourcePath = "Art/ui/icon_ammo";
+        public const string UiIconMoraleResourcePath = "Art/ui/icon_morale";
+        public const string UiIconBattleResourcePath = "Art/ui/icon_battle";
 
         public static readonly Color CanvasBackground = Hex("#0B1118");
         public static readonly Color TopBar = Hex("#121C28", 0.96f);
         public static readonly Color ObjectiveBar = Hex("#0F1722", 0.92f);
         public static readonly Color SidePanel = Hex("#101923", 0.94f);
         public static readonly Color MapFrame = Hex("#2A3D52", 0.85f);
+        public static readonly Color MapFrameInner = Hex("#0A1018", 0.92f);
         public static readonly Color MapBackdrop = Hex("#070B10", 0.72f);
+        public static readonly Color MapVignette = Hex("#000000", 0.55f);
 
         public static readonly Color TextPrimary = Hex("#FFFFFF");
         public static readonly Color TextMuted = Hex("#C5D4E4");
@@ -40,7 +46,8 @@ namespace BastionUA.Core
         public static readonly Color MapFillSouth = Hex("#123D58");
         public static readonly Color MapOutline = Hex("#F5FAFF");
         public static readonly Color MapCoast = Hex("#6EB5E8");
-        public static readonly Color MapConnection = Hex("#4A6885", 0.75f);
+        public static readonly Color MapCrimeaZoneTint = Hex("#2A4A62");
+        public static readonly Color MapConnection = Hex("#4A6885", 0.42f);
         public static readonly Color MapMarkerCore = Hex("#F8FBFF");
         public static readonly Color MapSelectionRing = Hex("#FFD700");
 
@@ -48,6 +55,10 @@ namespace BastionUA.Core
         public static readonly Color EventPanel = Hex("#0F1722", 0.98f);
         public static readonly Color EventChoice = Hex("#1E3550");
         public static readonly Color PopupFrame = Hex("#FFD700");
+
+        public static readonly Color SidebarInsetPanel = Hex("#0A121C", 0.88f);
+        public static readonly Color SidebarUpgradeRow = Hex("#141F2B", 0.82f);
+        public static readonly Color SidebarFooter = Hex("#0C141D", 0.94f);
 
         private static Color Hex(string hex, float alphaOverride = 1f)
         {

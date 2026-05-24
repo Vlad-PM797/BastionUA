@@ -42,7 +42,53 @@ namespace BastionUA.UI
             overlayImage.color = GameVisualPalette.EventOverlay;
             overlayImage.raycastTarget = true;
 
+            overlayRoot.AddComponent<CanvasGroup>();
+            overlayRoot.AddComponent<UiPopupFadeIn>();
+
             return overlayRoot;
+        }
+
+        public static void CreateBattleOutcomeStripe(Transform panelTransform, bool isVictory)
+        {
+            var stripeObject = new GameObject("OutcomeStripe", typeof(RectTransform), typeof(Image));
+            stripeObject.transform.SetParent(panelTransform, false);
+
+            var rectTransform = stripeObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(1f, 1f);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+            rectTransform.anchoredPosition = new Vector2(0f, -GameUiConstants.PopupAccentStripeHeight);
+            rectTransform.sizeDelta = new Vector2(0f, GameUiConstants.PopupOutcomeStripeHeight);
+
+            var stripeColor = isVictory
+                ? GameVisualPalette.StatusSafe
+                : GameVisualPalette.StatusOccupied;
+            stripeObject.GetComponent<Image>().color = stripeColor;
+            stripeObject.GetComponent<Image>().raycastTarget = false;
+        }
+
+        public static void CreatePopupIcon(
+            Transform parent,
+            string name,
+            UiIconKind kind,
+            Vector2 anchor,
+            Vector2 anchoredPosition,
+            float size)
+        {
+            var iconObject = new GameObject(name, typeof(RectTransform), typeof(Image));
+            iconObject.transform.SetParent(parent, false);
+
+            var rectTransform = iconObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = anchor;
+            rectTransform.anchorMax = anchor;
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchoredPosition = anchoredPosition;
+            rectTransform.sizeDelta = new Vector2(size, size);
+
+            var image = iconObject.GetComponent<Image>();
+            image.sprite = UiIconLoader.LoadIcon(kind);
+            image.preserveAspect = true;
+            image.raycastTarget = false;
         }
 
         public static GameObject CreateStyledPanel(Transform parent, float width, float height)

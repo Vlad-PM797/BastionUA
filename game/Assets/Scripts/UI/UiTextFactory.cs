@@ -169,6 +169,11 @@ namespace BastionUA.UI
             markerObject.GetComponent<Image>().raycastTarget = false;
         }
 
+        public static void AddDropShadow(Text text)
+        {
+            AddShadow(text);
+        }
+
         private static void AddShadow(Text text)
         {
             var shadow = text.gameObject.AddComponent<Shadow>();

@@ -44,6 +44,8 @@ namespace BastionUA.Core
         public const float PopupAccentStripeHeight = 4f;
         public const float PopupFrameInset = 3f;
         public const float ButtonFrameInset = 3f;
+        public const float PopupFadeInDurationSeconds = 0.2f;
+        public const float PopupOutcomeStripeHeight = 5f;
 
         public const string OnboardingHint = "\u041e\u0431\u0435\u0440\u0438 \u0440\u0435\u0433\u0456\u043e\u043d \u043d\u0430 \u043a\u0430\u0440\u0442\u0456 \u2192 Battle. \u041f\u043e\u0434\u0456\u0457 \u0437\u2019\u044f\u0432\u043b\u044f\u044e\u0442\u044c\u0441\u044f \u043f\u0456\u0434 \u0447\u0430\u0441 \u0432\u0456\u0439\u043d\u0438.";
         public const string ObjectiveFallback = "\u0422\u0440\u0438\u043c\u0430\u0439 \u043e\u0431\u043e\u0440\u043e\u043d\u0443 \u0442\u0430 \u0440\u043e\u0437\u0432\u0438\u0432\u0430\u0439 \u0440\u0435\u0441\u0443\u0440\u0441\u0438.";
@@ -90,6 +92,25 @@ namespace BastionUA.Core
         public const float MarkerPulseMaxAlpha = 1f;
         public const float ButtonHighlightBlend = 0.12f;
         public const float ButtonPressedBlend = 0.2f;
+
+        public const int MapVignetteTextureSize = 256;
+        public const float MapVignetteInnerRadius = 0.38f;
+        public const float MapFrameInnerInsetPixels = 4f;
+
+        public const float SidebarLogPanelTopAnchor = 0.71f;
+        public const float SidebarLogPanelBottomAnchor = 0.58f;
+        public const float SidebarUpgradeRowHeight = 34f;
+        public const float SidebarUpgradeRowSpacing = 0.065f;
+        public const float SidebarUpgradeFirstAnchor = 0.21f;
+        public const float SidebarFooterBottomAnchor = 0.02f;
+        public const float SidebarFooterTopAnchor = 0.075f;
+        public const float SidebarResetButtonWidth = 236f;
+        public const float SidebarResetButtonHeight = 34f;
+        public const float SidebarPurchaseButtonWidth = 48f;
+
+        public const float HudStatIconSize = 22f;
+        public const float HudStatIconTextOffset = 0.024f;
+        public const float HudBattleIconSize = 26f;
 
         public static Color PanelBackground => GameVisualPalette.SidePanel;
         public static Color TextPrimary => GameVisualPalette.TextPrimary;

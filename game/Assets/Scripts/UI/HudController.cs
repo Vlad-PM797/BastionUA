@@ -90,13 +90,16 @@ namespace BastionUA.UI
                 Vector2.zero,
                 GameVisualPalette.TopBar);
             CreateFlagStripe(topBar.transform, "TopBarStripe");
-            _ammoText = CreateHudStatText(topBar.transform, "AmmoText", new Vector2(0.02f, 0.5f));
-            _prestigeText = CreateHudStatText(topBar.transform, "PrestigeText", new Vector2(0.24f, 0.5f));
-            _moraleText = CreateHudStatText(topBar.transform, "MoraleText", new Vector2(0.42f, 0.5f));
+            CreateHudStatIcon(topBar.transform, "AmmoIcon", new Vector2(0.015f, 0.5f), UiIconKind.Ammo);
+            _ammoText = CreateHudStatText(topBar.transform, "AmmoText", new Vector2(0.039f, 0.5f));
+            _prestigeText = CreateHudStatText(topBar.transform, "PrestigeText", new Vector2(0.22f, 0.5f));
+            CreateHudStatIcon(topBar.transform, "MoraleIcon", new Vector2(0.36f, 0.5f), UiIconKind.Morale);
+            _moraleText = CreateHudStatText(topBar.transform, "MoraleText", new Vector2(0.384f, 0.5f));
+            CreateHudStatIcon(topBar.transform, "BattleIcon", new Vector2(0.50f, 0.5f), UiIconKind.Battle);
             _selectedRegionText = CreateHudStatText(
                 topBar.transform,
                 "SelectedText",
-                new Vector2(0.60f, 0.5f),
+                new Vector2(0.58f, 0.5f),
                 GameUiConstants.SelectedStatTextWidth);
             CreateFramedActionButton(
                 topBar.transform,
@@ -149,7 +152,7 @@ namespace BastionUA.UI
                 new Vector2(200f, 56f)).Root;
             _prestigeButtonObject.SetActive(false);
 
-            Debug.Log("[HudController] HUD visual A2 button feedback built.");
+            Debug.Log("[HudController] HUD visual A5 sidebar polish built.");
         }
 
         private static void CreateCanvasBackground(Transform canvasTransform)
@@ -221,9 +224,15 @@ namespace BastionUA.UI
             CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.84f);
             CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.78f);
             CreateSectionTitle(legendPanel.transform, "EventLogTitle", GameUiConstants.LabelEventLog, 0.72f);
-            _eventLogText = CreateMultilineText(legendPanel.transform, "EventLogText", 0.66f);
+            var logPanel = UiSidebarFactory.CreateInsetPanel(
+                legendPanel.transform,
+                "EventLogPanel",
+                new Vector2(0.06f, GameUiConstants.SidebarLogPanelBottomAnchor),
+                new Vector2(0.94f, GameUiConstants.SidebarLogPanelTopAnchor),
+                GameVisualPalette.SidebarInsetPanel);
+            _eventLogText = UiSidebarFactory.CreateEventLogText(logPanel);
             BuildProgressionPanel(legendPanel.transform);
-            CreateFramedActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.04f), OnResetClicked, false);
+            UiSidebarFactory.CreateFooterResetButton(legendPanel.transform, OnResetClicked);
         }
 
         private static void CreateSideAccent(Transform parent)
@@ -254,6 +263,7 @@ namespace BastionUA.UI
                     $"Unit_{unit.UnitId}",
                     unit.ShortLabel,
                     new Vector2(0.5f, anchorY),
+                    new Vector2(180f, 36f),
                     () => OnUnitClicked(unit.UnitId));
                 _unitButtonBackgrounds[unit.UnitId] = button.GetComponent<Image>();
                 unitIndex++;
@@ -261,22 +271,17 @@ namespace BastionUA.UI
 
             CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, 0.26f);
 
-            var upgradeAnchors = new[] { 0.20f, 0.14f, 0.08f };
             var upgradeIndex = 0;
             foreach (var upgrade in UpgradeCatalog.All)
             {
-                var anchorY = upgradeAnchors[upgradeIndex];
-                var labelText = CreateCompactButtonLabel(legendPanel, $"Upgrade_{upgrade.UpgradeId}", anchorY);
-                _upgradeButtonLabels[upgrade.UpgradeId] = labelText;
-
-                UiButtonFactory.CreateCompactButton(
+                var anchorY = GameUiConstants.SidebarUpgradeFirstAnchor -
+                                upgradeIndex * GameUiConstants.SidebarUpgradeRowSpacing;
+                var labelText = UiSidebarFactory.CreateUpgradeRow(
                     legendPanel,
-                    $"UpgradeBtn_{upgrade.UpgradeId}",
-                    "+",
-                    new Vector2(0.88f, anchorY),
-                    () => OnUpgradeClicked(upgrade.UpgradeId),
-                    new Vector2(44f, 32f));
-
+                    upgrade.UpgradeId,
+                    anchorY,
+                    () => OnUpgradeClicked(upgrade.UpgradeId));
+                _upgradeButtonLabels[upgrade.UpgradeId] = labelText;
                 upgradeIndex++;
             }
         }
@@ -455,6 +460,23 @@ namespace BastionUA.UI
                 UiTextFactory.FormatStatLine("--", "--"));
         }
 
+        private static void CreateHudStatIcon(Transform parent, string name, Vector2 anchor, UiIconKind kind)
+        {
+            var iconObject = new GameObject(name, typeof(RectTransform), typeof(Image));
+            iconObject.transform.SetParent(parent, false);
+
+            var rectTransform = iconObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = anchor;
+            rectTransform.anchorMax = anchor;
+            rectTransform.pivot = new Vector2(0f, 0.5f);
+            rectTransform.sizeDelta = new Vector2(GameUiConstants.HudStatIconSize, GameUiConstants.HudStatIconSize);
+
+            var image = iconObject.GetComponent<Image>();
+            image.sprite = UiIconLoader.LoadIcon(kind);
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+        }
+
         private static void CreateTitle(Transform parent, string name, string content)
         {
             var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
@@ -523,44 +545,6 @@ namespace BastionUA.UI
                 content,
                 TextAnchor.MiddleCenter);
             UiTextFactory.CreateSectionUnderline(parent, anchorY);
-        }
-
-        private static Text CreateCompactButtonLabel(Transform parent, string name, float anchorY)
-        {
-            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
-            textObject.transform.SetParent(parent, false);
-
-            var rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0.08f, anchorY);
-            rectTransform.anchorMax = new Vector2(0.72f, anchorY);
-            rectTransform.pivot = new Vector2(0f, 0.5f);
-            rectTransform.anchoredPosition = Vector2.zero;
-            rectTransform.sizeDelta = new Vector2(200f, 32f);
-
-            return ConfigureText(textObject.GetComponent<Text>(), "--", GameUiConstants.CompactFontSize, TextAnchor.MiddleLeft, GameVisualPalette.TextMuted);
-        }
-
-        private static Text CreateMultilineText(Transform parent, string name, float anchorY)
-        {
-            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
-            textObject.transform.SetParent(parent, false);
-
-            var rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0.08f, anchorY);
-            rectTransform.anchorMax = new Vector2(0.92f, anchorY);
-            rectTransform.pivot = new Vector2(0.5f, 1f);
-            rectTransform.anchoredPosition = Vector2.zero;
-            rectTransform.sizeDelta = new Vector2(260f, 72f);
-
-            var text = textObject.GetComponent<Text>();
-            text.text = "--";
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = GameUiConstants.CompactFontSize;
-            text.color = GameVisualPalette.TextObjective;
-            text.alignment = TextAnchor.UpperLeft;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.verticalOverflow = VerticalWrapMode.Truncate;
-            return text;
         }
 
         private static UiFramedButtonResult CreateFramedActionButton(
