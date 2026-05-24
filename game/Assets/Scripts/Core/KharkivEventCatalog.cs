@@ -28,7 +28,7 @@ namespace BastionUA.Core
                         AmmoDelta = -30,
                         MoraleDelta = 12,
                         TargetRegionId = TargetRegionId,
-                        RegionStatusStep = 1
+                        RegionStatusStep = -1
                     },
                     new EventChoiceDefinition
                     {
@@ -37,7 +37,7 @@ namespace BastionUA.Core
                         AmmoDelta = -15,
                         MoraleDelta = 6,
                         TargetRegionId = TargetRegionId,
-                        RegionStatusStep = 1
+                        RegionStatusStep = -1
                     }
                 }
             };

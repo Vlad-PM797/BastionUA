@@ -1,13 +1,16 @@
-# Bastion UA — Week 7 (CLOSED)
+# Bastion UA — Week 8 (CLOSED)
 
-Статус: **DONE** (2026-05-21)  
-Checkpoint: [`docs/week7_checkpoint.md`](week7_checkpoint.md)
+Статус: **DONE** (2026-05-22)  
+Checkpoint: [`docs/week8_checkpoint.md`](week8_checkpoint.md)
 
-## Week 7 Deliverables
-- [x] `GameVisualPalette` — UA-themed color system
-- [x] PNG map asset + runtime loader + editor baker
-- [x] HUD reskin (panels, accents, primary Battle button)
-- [x] Map frame + pin markers
+## Week 8 Deliverables
+- [x] `PopupUiFactory` + event/battle popup polish
+- [x] Windows Release build menu
+- [x] Verification extended (palette + map asset)
+- [x] Demo freeze docs
 
-## Week 8 Entry
-See [`docs/week7_checkpoint.md`](week7_checkpoint.md) § Next.
+## Solo prototype milestone
+Week 8 closes the **8-week solo vertical slice** per [`docs/08_solo_version_plan.md`](08_solo_version_plan.md) Milestone D.
+
+## Post-prototype
+See [`docs/week8_checkpoint.md`](week8_checkpoint.md) § Next.

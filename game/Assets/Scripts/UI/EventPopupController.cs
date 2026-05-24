@@ -81,47 +81,28 @@ namespace BastionUA.UI
 
         private void BuildPopup(EventDefinition eventDefinition)
         {
-            _overlayRoot = new GameObject("EventPopupRoot", typeof(RectTransform));
-            _overlayRoot.transform.SetParent(CreateEventCanvasTransform(), false);
+            var canvasTransform = PopupUiFactory.EnsureCanvas(GameUiConstants.EventCanvasName, 200);
+            _overlayRoot = PopupUiFactory.CreateOverlayRoot(canvasTransform, "EventPopupRoot");
 
-            var overlayRect = _overlayRoot.GetComponent<RectTransform>();
-            StretchFullScreen(overlayRect);
+            var panelObject = PopupUiFactory.CreateStyledPanel(
+                _overlayRoot.transform,
+                GameUiConstants.EventPanelWidth,
+                GameUiConstants.EventPanelHeight);
 
-            var overlayImage = _overlayRoot.AddComponent<Image>();
-            overlayImage.color = GameUiConstants.EventOverlay;
-
-            var panelObject = new GameObject("EventPanel", typeof(RectTransform), typeof(Image));
-            panelObject.transform.SetParent(_overlayRoot.transform, false);
-
-            var panelRect = panelObject.GetComponent<RectTransform>();
-            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
-            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.sizeDelta = new Vector2(GameUiConstants.EventPanelWidth, GameUiConstants.EventPanelHeight);
-
-            panelObject.GetComponent<Image>().color = GameUiConstants.EventPanelBackground;
-
-            CreateText(
+            PopupUiFactory.CreateTitle(
                 panelObject.transform,
                 "EventTitle",
                 eventDefinition.Title,
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -28f),
+                new Vector2(0f, -36f),
                 new Vector2(680f, 48f),
-                GameUiConstants.EventTitleFontSize,
-                TextAnchor.UpperCenter);
+                GameVisualPalette.TextAccent);
 
-            CreateText(
+            PopupUiFactory.CreateBody(
                 panelObject.transform,
                 "EventDescription",
                 eventDefinition.Description,
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -110f),
-                new Vector2(680f, 140f),
-                GameUiConstants.EventBodyFontSize,
-                TextAnchor.UpperCenter);
+                new Vector2(0f, -118f),
+                new Vector2(680f, 140f));
 
             if (eventDefinition.Choices == null || eventDefinition.Choices.Count == 0)
             {
@@ -143,32 +124,12 @@ namespace BastionUA.UI
             Vector2 anchor)
         {
             var choice = eventDefinition.Choices[choiceIndex];
-            var buttonObject = new GameObject($"Choice_{choice.ChoiceId}", typeof(RectTransform), typeof(Image), typeof(Button));
-            buttonObject.transform.SetParent(parent, false);
-
-            var rectTransform = buttonObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = anchor;
-            rectTransform.anchorMax = anchor;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(640f, 56f);
-
-            buttonObject.GetComponent<Image>().color = GameUiConstants.EventChoiceButton;
-
-            var button = buttonObject.GetComponent<Button>();
+            var button = PopupUiFactory.CreateChoiceButton(
+                parent,
+                $"Choice_{choice.ChoiceId}",
+                choice.Label,
+                anchor);
             button.onClick.AddListener(() => OnChoiceSelected(eventDefinition, choiceIndex));
-
-            var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
-            labelObject.transform.SetParent(buttonObject.transform, false);
-
-            var labelRect = labelObject.GetComponent<RectTransform>();
-            StretchFullScreen(labelRect);
-
-            var labelText = labelObject.GetComponent<Text>();
-            labelText.text = choice.Label;
-            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            labelText.fontSize = GameUiConstants.BaseFontSize;
-            labelText.color = GameUiConstants.TextPrimary;
-            labelText.alignment = TextAnchor.MiddleCenter;
         }
 
         private void OnChoiceSelected(EventDefinition eventDefinition, int choiceIndex)
@@ -204,71 +165,6 @@ namespace BastionUA.UI
             {
                 _bootstrap.SetGameplayPaused(false);
             }
-        }
-
-        private static Transform CreateEventCanvasTransform()
-        {
-            var existingCanvas = GameObject.Find(GameUiConstants.EventCanvasName);
-            if (existingCanvas != null)
-            {
-                return existingCanvas.transform;
-            }
-
-            var canvasObject = new GameObject(
-                GameUiConstants.EventCanvasName,
-                typeof(Canvas),
-                typeof(CanvasScaler),
-                typeof(GraphicRaycaster));
-
-            var canvas = canvasObject.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 200;
-
-            var scaler = canvasObject.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(GameUiConstants.ReferenceWidth, GameUiConstants.ReferenceHeight);
-            scaler.matchWidthOrHeight = 0.5f;
-
-            return canvasObject.transform;
-        }
-
-        private static void CreateText(
-            Transform parent,
-            string name,
-            string content,
-            Vector2 anchorMin,
-            Vector2 anchorMax,
-            Vector2 anchoredPosition,
-            Vector2 sizeDelta,
-            int fontSize,
-            TextAnchor alignment)
-        {
-            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
-            textObject.transform.SetParent(parent, false);
-
-            var rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = anchorMin;
-            rectTransform.anchorMax = anchorMax;
-            rectTransform.pivot = new Vector2(0.5f, 1f);
-            rectTransform.anchoredPosition = anchoredPosition;
-            rectTransform.sizeDelta = sizeDelta;
-
-            var text = textObject.GetComponent<Text>();
-            text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = fontSize;
-            text.color = GameUiConstants.TextPrimary;
-            text.alignment = alignment;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.verticalOverflow = VerticalWrapMode.Overflow;
-        }
-
-        private static void StretchFullScreen(RectTransform rectTransform)
-        {
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
         }
     }
 }

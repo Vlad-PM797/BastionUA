@@ -28,15 +28,18 @@
 | — | [Week 3 Checkpoint](./docs/week3_checkpoint.md) | ✅ Irpin event, objectives, reset save, build |
 | — | [Week 4 Checkpoint](./docs/week4_checkpoint.md) | ✅ Battle popup, units, upgrades |
 | — | [Week 5 Checkpoint](./docs/week5_checkpoint.md) | ✅ Map v2, Kharkiv, battle balance |
+| — | [Week 7 Checkpoint](./docs/week7_checkpoint.md) | ✅ UA palette, map PNG, HUD reskin |
+| — | [Week 8 Checkpoint](./docs/week8_checkpoint.md) | ✅ Popup polish, release build, demo freeze |
 
-### Unity prototype (Week 5 ✅)
+### Unity prototype (Week 8 ✅ — solo slice complete)
 - Проєкт: [`game/`](./game/) — Unity 6000.4.4f1
 - Dev guide: [`game/README_START_TODAY.md`](./game/README_START_TODAY.md)
 - **GitHub**: https://github.com/Vlad-PM797/BastionUA
 
 #### Share Windows build
-1. Unity → **BastionUA → Build Windows Dev**
-2. Архів `game/Builds/Windows/` → надіслати `BastionUA.exe` + `_Data` folder
+1. **Demo / pitch:** Unity → **BastionUA → Build Windows Release** → `game/Builds/WindowsRelease/`
+2. **Dev debug:** Unity → **BastionUA → Build Windows Dev** → `game/Builds/Windows/`
+3. Архів папки → надіслати `BastionUA.exe` + `BastionUA_Data`
 
 ---
 

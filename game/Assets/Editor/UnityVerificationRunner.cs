@@ -38,6 +38,8 @@ namespace BastionUA.EditorTools
                 failures += VerifyChornobaivkaEventFlow() ? 0 : 1;
                 failures += VerifyIrpinEventFlow() ? 0 : 1;
                 failures += VerifyKharkivEventFlow() ? 0 : 1;
+                failures += VerifyVisualPaletteAssets() ? 0 : 1;
+                failures += VerifyMapArtResource() ? 0 : 1;
             }
             catch (Exception exception)
             {
@@ -497,6 +499,7 @@ namespace BastionUA.EditorTools
                 return false;
             }
 
+            state.HasSeenOnboarding = true;
             var hint = ObjectiveHintService.GetHint(state);
             if (hint != GameUiConstants.ObjectiveThirdBattle)
             {
@@ -538,7 +541,7 @@ namespace BastionUA.EditorTools
             var kharkivBefore = mapService.GetRegion(state, KharkivEventCatalog.TargetRegionId);
             var statusBefore = kharkivBefore.Status;
 
-            if (!eventService.TryApplyChoice(state, mapService, kharkivEvent, 1, out _))
+            if (!eventService.TryApplyChoice(state, mapService, kharkivEvent, 0, out _))
             {
                 Debug.LogError("[UnityVerification] Kharkiv choice apply failed.");
                 return false;
@@ -556,6 +559,7 @@ namespace BastionUA.EditorTools
                 return false;
             }
 
+            state.HasSeenOnboarding = true;
             var hint = ObjectiveHintService.GetHint(state);
             if (hint != GameUiConstants.ObjectiveKharkiv && hint != GameUiConstants.ObjectiveProgression)
             {
@@ -564,6 +568,45 @@ namespace BastionUA.EditorTools
             }
 
             Debug.Log("[UnityVerification] Kharkiv event flow OK.");
+            return true;
+        }
+
+        private static bool VerifyVisualPaletteAssets()
+        {
+            if (string.IsNullOrEmpty(GameVisualPalette.UkraineMapResourcePath))
+            {
+                Debug.LogError("[UnityVerification] Ukraine map resource path missing.");
+                return false;
+            }
+
+            if (GameVisualPalette.CanvasBackground.a <= 0f)
+            {
+                Debug.LogError("[UnityVerification] Canvas background color invalid.");
+                return false;
+            }
+
+            if (GameUiConstants.EventPanelBackground != GameVisualPalette.EventPanel)
+            {
+                Debug.LogError("[UnityVerification] GameUiConstants should delegate popup colors to GameVisualPalette.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Visual palette wiring OK.");
+            return true;
+        }
+
+        private static bool VerifyMapArtResource()
+        {
+            var mapPath = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map.png");
+            if (!File.Exists(mapPath))
+            {
+                Debug.LogWarning("[UnityVerification] ukraine_map.png missing; runtime rasterizer fallback will be used.");
+            }
+            else
+            {
+                Debug.Log("[UnityVerification] ukraine_map.png asset present.");
+            }
+
             return true;
         }
     }
