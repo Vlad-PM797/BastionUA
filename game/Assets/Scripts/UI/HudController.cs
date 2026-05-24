@@ -15,6 +15,9 @@ namespace BastionUA.UI
         private Text _moraleText;
         private Text _selectedRegionText;
         private Text _objectiveText;
+        private Text _prestigeText;
+        private Text _eventLogText;
+        private GameObject _prestigeButtonObject;
         private readonly Dictionary<string, Image> _unitButtonBackgrounds = new Dictionary<string, Image>();
         private readonly Dictionary<string, Text> _upgradeButtonLabels = new Dictionary<string, Text>();
 
@@ -87,8 +90,10 @@ namespace BastionUA.UI
                 GameVisualPalette.TopBar);
             CreateFlagStripe(topBar.transform, "TopBarStripe");
             _ammoText = CreateStatText(topBar.transform, "AmmoText", new Vector2(0.02f, 0.5f), $"{GameUiConstants.LabelAmmo}: --");
-            _moraleText = CreateStatText(topBar.transform, "MoraleText", new Vector2(0.34f, 0.5f), $"{GameUiConstants.LabelMorale}: --");
-            _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.66f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
+            _prestigeText = CreateStatText(topBar.transform, "PrestigeText", new Vector2(0.24f, 0.5f), $"{GameUiConstants.LabelPrestige}: 0");
+            _prestigeText.fontSize = GameUiConstants.BaseFontSize;
+            _moraleText = CreateStatText(topBar.transform, "MoraleText", new Vector2(0.42f, 0.5f), $"{GameUiConstants.LabelMorale}: --");
+            _selectedRegionText = CreateStatText(topBar.transform, "SelectedText", new Vector2(0.68f, 0.5f), $"{GameUiConstants.LabelSelectedRegion}: --");
 
             BuildObjectiveBar(canvasObject.transform);
             BuildLegendPanel(canvasObject.transform);
@@ -103,9 +108,18 @@ namespace BastionUA.UI
                 new Vector2(0f, GameUiConstants.BottomBarHeight),
                 GameVisualPalette.TopBar);
             CreateActionButton(bottomBar.transform, "TapButton", GameUiConstants.ButtonTap, new Vector2(0.2f, 0.5f), OnTapClicked, false);
-            CreateActionButton(bottomBar.transform, "BattleButton", GameUiConstants.ButtonBattle, new Vector2(0.62f, 0.5f), OnBattleClicked, true);
+            CreateActionButton(bottomBar.transform, "BattleButton", GameUiConstants.ButtonBattle, new Vector2(0.52f, 0.5f), OnBattleClicked, true);
+            _prestigeButtonObject = CreateActionButton(
+                bottomBar.transform,
+                "PrestigeButton",
+                GameUiConstants.ButtonPrestige,
+                new Vector2(0.82f, 0.5f),
+                OnPrestigeClicked,
+                true,
+                new Vector2(200f, 56f)).gameObject;
+            _prestigeButtonObject.SetActive(false);
 
-            Debug.Log("[HudController] HUD with Week 7 visual theme built.");
+            Debug.Log("[HudController] HUD with Week 9 progression theme built.");
         }
 
         private static void CreateCanvasBackground(Transform canvasTransform)
@@ -166,11 +180,13 @@ namespace BastionUA.UI
 
             CreateSideAccent(legendPanel.transform);
             CreateTitle(legendPanel.transform, "LegendTitle", MapUiConstants.LegendTitle);
-            CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.88f);
-            CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.80f);
-            CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.72f);
+            CreateLegendEntry(legendPanel.transform, "LegendSafe", MapUiConstants.LegendSafe, GameUiConstants.StatusSafe, 0.90f);
+            CreateLegendEntry(legendPanel.transform, "LegendDanger", MapUiConstants.LegendDanger, GameUiConstants.StatusDanger, 0.84f);
+            CreateLegendEntry(legendPanel.transform, "LegendOccupied", MapUiConstants.LegendOccupied, GameUiConstants.StatusOccupied, 0.78f);
+            CreateSectionTitle(legendPanel.transform, "EventLogTitle", GameUiConstants.LabelEventLog, 0.72f);
+            _eventLogText = CreateMultilineText(legendPanel.transform, "EventLogText", 0.66f);
             BuildProgressionPanel(legendPanel.transform);
-            CreateActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.06f), OnResetClicked, false);
+            CreateActionButton(legendPanel.transform, "ResetButton", GameUiConstants.ButtonResetSave, new Vector2(0.5f, 0.04f), OnResetClicked, false);
         }
 
         private static void CreateSideAccent(Transform parent)
@@ -189,9 +205,9 @@ namespace BastionUA.UI
 
         private void BuildProgressionPanel(Transform legendPanel)
         {
-            CreateSectionTitle(legendPanel, "UnitsTitle", GameUiConstants.LabelUnits, 0.64f);
+            CreateSectionTitle(legendPanel, "UnitsTitle", GameUiConstants.LabelUnits, 0.56f);
 
-            var unitAnchors = new[] { 0.58f, 0.52f, 0.46f, 0.40f };
+            var unitAnchors = new[] { 0.50f, 0.44f, 0.38f, 0.32f };
             var unitIndex = 0;
             foreach (var unit in UnitCatalog.All)
             {
@@ -206,9 +222,9 @@ namespace BastionUA.UI
                 unitIndex++;
             }
 
-            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, 0.34f);
+            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, 0.26f);
 
-            var upgradeAnchors = new[] { 0.28f, 0.22f, 0.16f };
+            var upgradeAnchors = new[] { 0.20f, 0.14f, 0.08f };
             var upgradeIndex = 0;
             foreach (var upgrade in UpgradeCatalog.All)
             {
@@ -238,9 +254,46 @@ namespace BastionUA.UI
             var selectedLabel = selectedRegion != null ? selectedRegion.DisplayName : state.LastSelectedRegionId;
             _selectedRegionText.text = $"{GameUiConstants.LabelSelectedRegion}: {selectedLabel}";
             _objectiveText.text = $"{GameUiConstants.LabelObjective}: {_bootstrap.GetObjectiveHint()}";
+            _prestigeText.text = $"{GameUiConstants.LabelPrestige}: {state.PrestigeLevel}";
+
+            if (_prestigeButtonObject != null)
+            {
+                _prestigeButtonObject.SetActive(_bootstrap.CanPrestige());
+            }
+
+            RefreshEventLog();
 
             _regionMapView.Refresh(_bootstrap, state);
             RefreshProgressionPanel(state);
+        }
+
+        private void RefreshEventLog()
+        {
+            if (_eventLogText == null || _bootstrap == null)
+            {
+                return;
+            }
+
+            var entries = _bootstrap.GetEventLogEntries();
+            if (entries.Count == 0)
+            {
+                _eventLogText.text = "--";
+                return;
+            }
+
+            var lines = new System.Text.StringBuilder();
+            var limit = Mathf.Min(entries.Count, GameConstants.EventLogDisplayLines);
+            for (var index = 0; index < limit; index++)
+            {
+                if (index > 0)
+                {
+                    lines.Append('\n');
+                }
+
+                lines.Append(entries[index]);
+            }
+
+            _eventLogText.text = lines.ToString();
         }
 
         private void RefreshProgressionPanel(GameState state)
@@ -270,6 +323,11 @@ namespace BastionUA.UI
                 var cost = upgrade.GetCostForNextLevel(level);
                 label.text = $"{upgrade.DisplayName} L{level} ({cost})";
             }
+        }
+
+        private void OnPrestigeClicked()
+        {
+            _bootstrap?.RunPrestige();
         }
 
         private void OnResetClicked()
@@ -439,6 +497,29 @@ namespace BastionUA.UI
             return ConfigureText(textObject.GetComponent<Text>(), "--", 16, TextAnchor.MiddleLeft, GameVisualPalette.TextMuted);
         }
 
+        private static Text CreateMultilineText(Transform parent, string name, float anchorY)
+        {
+            var textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
+            textObject.transform.SetParent(parent, false);
+
+            var rectTransform = textObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0.08f, anchorY);
+            rectTransform.anchorMax = new Vector2(0.92f, anchorY);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.sizeDelta = new Vector2(260f, 72f);
+
+            var text = textObject.GetComponent<Text>();
+            text.text = "--";
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = 14;
+            text.color = GameVisualPalette.TextObjective;
+            text.alignment = TextAnchor.UpperLeft;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            return text;
+        }
+
         private static Button CreateCompactButton(
             Transform parent,
             string name,
@@ -475,9 +556,10 @@ namespace BastionUA.UI
             string label,
             Vector2 anchor,
             Action onClick,
-            bool isPrimary)
+            bool isPrimary,
+            Vector2? buttonSize = null)
         {
-            var buttonSize = new Vector2(280f, 56f);
+            var resolvedSize = buttonSize ?? new Vector2(280f, 56f);
             var frameColor = isPrimary
                 ? GameVisualPalette.ButtonPrimaryBorder
                 : GameVisualPalette.ButtonNeutralBorder;
@@ -495,7 +577,7 @@ namespace BastionUA.UI
             frameRect.anchorMin = anchor;
             frameRect.anchorMax = anchor;
             frameRect.pivot = new Vector2(0.5f, 0.5f);
-            frameRect.sizeDelta = buttonSize;
+            frameRect.sizeDelta = resolvedSize;
             frameObject.GetComponent<Image>().color = frameColor;
 
             var fillObject = new GameObject("Fill", typeof(RectTransform), typeof(Image));

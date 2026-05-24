@@ -56,7 +56,22 @@ namespace BastionUA.Services
                 return GameUiConstants.ObjectiveKharkiv;
             }
 
+            if (CanPrestige(state))
+            {
+                return GameUiConstants.ObjectivePrestigeReady;
+            }
+
+            if (state.PrestigeLevel >= GameConstants.MaxPrestigeLevel)
+            {
+                return GameUiConstants.ObjectivePrestigeMax;
+            }
+
             return GameUiConstants.ObjectiveProgression;
+        }
+
+        private static bool CanPrestige(GameState state)
+        {
+            return new PrestigeService().CanPrestige(state);
         }
 
         private static bool IsRegionOccupied(GameState state, string regionId)

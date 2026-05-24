@@ -1,9 +1,9 @@
-# BastionUA — Unity Prototype (Week 8 ✅)
+# BastionUA — Unity Prototype (Week 9 ✅)
 
 ## Статус
-- Week 1–8 checkpoints: [`docs/`](../docs/)
+- Week 1–9 checkpoints: [`docs/`](../docs/)
 - GitHub: https://github.com/Vlad-PM797/BastionUA
-- **Solo 8-week slice:** complete (demo freeze)
+- **Solo slice:** prestige loop + SFX stub + event log
 
 ## Швидкий старт
 Unity Hub → `E:\BastionUA\game` → Boot scene → **Play**
@@ -11,10 +11,11 @@ Unity Hub → `E:\BastionUA\game` → Boot scene → **Play**
 ## Що працює
 - Core loop + **карта UA (4 регіони, PNG + Крим)** + save/load
 - **4 events:** Hostomel → Chornobaivka → Irpin → Kharkiv
-- **Units / upgrades / battle result popup** (Week 8 styled)
-- **UA visual theme** — palette, HUD reskin, popup polish
-- **Battle balance** — регіон, morale, progression
-- Dev hotkeys: T, **1-4 / QWER**, B, S
+- **Prestige** — reset кампанії з permanent bonus (max L5)
+- **Event log** — останні дії в sidebar
+- **Procedural SFX** — tap, battle, event, upgrade, prestige
+- Units / upgrades / battle popup + UA visual theme
+- Dev hotkeys: T, **1-4 / QWER**, B, S, **P** (prestige)
 
 ## Windows build (share)
 | Menu | Output |

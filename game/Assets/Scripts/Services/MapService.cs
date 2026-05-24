@@ -43,5 +43,27 @@ namespace BastionUA.Services
             region.Status = status;
             Debug.Log($"[MapService] {region.DisplayName}: {oldStatus} -> {status}");
         }
+
+        public void ResetRegionsToDefaults(GameState state)
+        {
+            if (state?.Regions == null)
+            {
+                return;
+            }
+
+            RegionCatalog.EnsureAllRegions(state.Regions);
+
+            foreach (var definition in RegionCatalog.All)
+            {
+                var region = GetRegion(state, definition.RegionId);
+                if (region == null)
+                {
+                    continue;
+                }
+
+                region.DisplayName = definition.DisplayName;
+                region.Status = definition.DefaultStatus;
+            }
+        }
     }
 }

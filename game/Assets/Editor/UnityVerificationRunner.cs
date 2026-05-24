@@ -40,6 +40,7 @@ namespace BastionUA.EditorTools
                 failures += VerifyKharkivEventFlow() ? 0 : 1;
                 failures += VerifyVisualPaletteAssets() ? 0 : 1;
                 failures += VerifyMapArtResource() ? 0 : 1;
+                failures += VerifyPrestigeFlow() ? 0 : 1;
             }
             catch (Exception exception)
             {
@@ -607,6 +608,52 @@ namespace BastionUA.EditorTools
                 Debug.Log("[UnityVerification] ukraine_map.png asset present.");
             }
 
+            return true;
+        }
+
+        private static bool VerifyPrestigeFlow()
+        {
+            var state = GameState.CreateDefault();
+            state.Normalize();
+            var mapService = new MapService();
+            var prestigeService = new PrestigeService();
+
+            state.MarkEventCompleted(HostomelEventCatalog.EventId);
+            state.MarkEventCompleted(ChornobaivkaEventCatalog.EventId);
+            state.MarkEventCompleted(IrpinEventCatalog.EventId);
+            state.MarkEventCompleted(KharkivEventCatalog.EventId);
+
+            foreach (var region in state.Regions)
+            {
+                region.Status = RegionStatus.Safe;
+            }
+
+            if (!prestigeService.CanPrestige(state))
+            {
+                Debug.LogError("[UnityVerification] Prestige should be available after campaign completion.");
+                return false;
+            }
+
+            if (!prestigeService.TryPrestige(state, mapService))
+            {
+                Debug.LogError("[UnityVerification] Prestige activation failed.");
+                return false;
+            }
+
+            if (state.PrestigeLevel != 1 || state.IsEventCompleted(HostomelEventCatalog.EventId))
+            {
+                Debug.LogError("[UnityVerification] Prestige should reset campaign and increment level.");
+                return false;
+            }
+
+            var modifiers = new ProgressionService().GetBattleModifiers(state);
+            if (modifiers.PlayerDamageBonus < GameConstants.PrestigeDamageBonusPerLevel)
+            {
+                Debug.LogError("[UnityVerification] Prestige should grant permanent damage bonus.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Prestige flow OK.");
             return true;
         }
     }

@@ -11,6 +11,9 @@ namespace BastionUA.Core
         public const string ButtonTap = "+ Ammo (Tap)";
         public const string ButtonBattle = "Battle";
         public const string ButtonResetSave = "Reset Save";
+        public const string ButtonPrestige = "Prestige";
+        public const string LabelEventLog = "Log";
+        public const string LabelPrestige = "Prestige";
         public const string HudRootName = "HUD";
         public const string CanvasName = "HudCanvas";
         public const string EventCanvasName = "EventCanvas";
@@ -53,6 +56,10 @@ namespace BastionUA.Core
         public const string ObjectiveExpandTerritory = "\u0423\u0441\u0456 \u043f\u043e\u0434\u0456\u0457 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u043e. \u041f\u043e\u0441\u0438\u043b\u044c \u0440\u0435\u0433\u0456\u043e\u043d\u0438 \u0431\u043e\u044f\u043c\u0438.";
         public const string ObjectiveProgression = "\u041e\u0431\u0435\u0440\u0438 \u043f\u0456\u0434\u0440\u043e\u0437\u0434\u0456\u043b \u0456 \u043a\u0443\u043f\u0438 \u0430\u043f\u0433\u0440\u0435\u0439\u0434 \u0434\u043b\u044f \u0441\u0438\u043b\u044c\u043d\u0456\u0448\u0438\u0445 \u0431\u043e\u0457\u0432.";
         public const string ObjectiveKharkiv = "\u0417\u0432\u0456\u043b\u044c\u043d\u0438 Kharkiv \u0431\u043e\u044f\u043c \u043d\u0430 \u043a\u0430\u0440\u0442\u0456.";
+        public const string ObjectivePrestigeReady =
+            "\u041a\u0430\u043c\u043f\u0430\u043d\u0456\u044f \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u0430. \u041d\u0430\u0442\u0438\u0441\u043d\u0438 Prestige \u0434\u043b\u044f \u0431\u043e\u043d\u0443\u0441\u0443 \u043d\u0430\u0441\u0442\u0443\u043f\u043d\u043e\u0433\u043e \u0446\u0438\u043a\u043b\u0443.";
+        public const string ObjectivePrestigeMax =
+            "\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u0438\u0439 Prestige \u0434\u043e\u0441\u044f\u0433\u043d\u0443\u0442\u043e. \u041f\u043e\u0441\u0438\u043b\u044c \u0440\u0435\u0433\u0456\u043e\u043d\u0438 \u0442\u0430 \u0433\u0440\u0430\u0439 \u0434\u0430\u043b\u0456.";
 
         public const float ReferenceWidth = 1920f;
         public const float ReferenceHeight = 1080f;

@@ -40,5 +40,34 @@ namespace BastionUA.Core
         public const int ChornobaivkaMinBattleCount = 1;
         public const int IrpinMinBattleCount = 2;
         public const int KharkivMinBattleCount = 3;
+
+        public const int MaxPrestigeLevel = 5;
+        public const int PrestigeDamageBonusPerLevel = 3;
+        public const int PrestigeAmmoBonusPerLevel = 20;
+        public const int PrestigeMoraleBonusPerLevel = 5;
+
+        public const int EventLogMaxEntries = 5;
+        public const int EventLogDisplayLines = 3;
+
+        public const int SfxSampleRate = 44100;
+        public const float SfxMasterVolume = 0.35f;
+        public const float SfxTapFrequencyHz = 520f;
+        public const float SfxTapDurationSeconds = 0.08f;
+        public const float SfxTapVolume = 0.25f;
+        public const float SfxVictoryFrequencyHz = 660f;
+        public const float SfxVictoryDurationSeconds = 0.18f;
+        public const float SfxVictoryVolume = 0.3f;
+        public const float SfxDefeatFrequencyHz = 180f;
+        public const float SfxDefeatDurationSeconds = 0.22f;
+        public const float SfxDefeatVolume = 0.28f;
+        public const float SfxEventFrequencyHz = 440f;
+        public const float SfxEventDurationSeconds = 0.12f;
+        public const float SfxEventVolume = 0.26f;
+        public const float SfxUpgradeFrequencyHz = 780f;
+        public const float SfxUpgradeDurationSeconds = 0.1f;
+        public const float SfxUpgradeVolume = 0.24f;
+        public const float SfxPrestigeFrequencyHz = 920f;
+        public const float SfxPrestigeDurationSeconds = 0.28f;
+        public const float SfxPrestigeVolume = 0.32f;
     }
 }

@@ -14,8 +14,11 @@ namespace BastionUA.Bootstrap
         private EventService _eventService;
         private EventTriggerService _eventTriggerService;
         private ProgressionService _progressionService;
+        private PrestigeService _prestigeService;
+        private EventLogService _eventLogService;
         private EventPopupController _eventPopupController;
         private BattleResultPopupController _battleResultPopupController;
+        private AudioFeedbackController _audioFeedbackController;
         private GameState _gameState;
 
         private float _autosaveAccumulator;
@@ -31,6 +34,21 @@ namespace BastionUA.Bootstrap
             return ObjectiveHintService.GetHint(_gameState);
         }
 
+        public int GetPrestigeLevel()
+        {
+            return _gameState?.PrestigeLevel ?? 0;
+        }
+
+        public bool CanPrestige()
+        {
+            return _prestigeService.CanPrestige(_gameState);
+        }
+
+        public System.Collections.Generic.IReadOnlyList<string> GetEventLogEntries()
+        {
+            return _eventLogService.GetRecentEntries();
+        }
+
         private void Awake()
         {
             _saveService = new SaveService();
@@ -40,10 +58,13 @@ namespace BastionUA.Bootstrap
             _eventService = new EventService();
             _eventTriggerService = new EventTriggerService();
             _progressionService = new ProgressionService();
+            _prestigeService = new PrestigeService();
+            _eventLogService = new EventLogService();
 
             _gameState = _saveService.LoadOrCreate();
             _gameState.Normalize();
             EnsureHud();
+            _eventLogService.AddEntry("Session started.");
 
             Debug.Log("[GameBootstrap] Initialized.");
             LogCurrentState();
@@ -88,6 +109,8 @@ namespace BastionUA.Bootstrap
             if (_eventService.TryApplyChoice(_gameState, _mapService, eventDefinition, choiceIndex, out var choice))
             {
                 _saveService.Save(_gameState);
+                _eventLogService.AddEntry($"Event: {eventDefinition.Title} -> {choice.Label}");
+                _audioFeedbackController?.PlayEventChoice();
                 Debug.Log(
                     $"[GameBootstrap] Event choice applied: {eventDefinition.EventId}/{choice.ChoiceId}. " +
                     $"Ammo={_gameState.Ammo}, Morale={_gameState.Morale}, Selected={_gameState.LastSelectedRegionId}");
@@ -110,6 +133,7 @@ namespace BastionUA.Bootstrap
 
             _resourceService.ManualTap(_gameState);
             MarkOnboardingSeen();
+            _audioFeedbackController?.PlayTap();
             LogCurrentState();
         }
 
@@ -153,6 +177,10 @@ namespace BastionUA.Bootstrap
             _gameState.TotalBattles++;
             MarkOnboardingSeen();
             _saveService.Save(_gameState);
+            _eventLogService.AddEntry(
+                result.IsVictory
+                    ? $"Victory at {result.RegionDisplayName}"
+                    : $"Defeat at {result.RegionDisplayName}");
             LogCurrentState();
             ShowBattleResult(result);
         }
@@ -181,6 +209,8 @@ namespace BastionUA.Bootstrap
             if (_progressionService.TryPurchaseUpgrade(_gameState, upgradeId))
             {
                 _saveService.Save(_gameState);
+                _eventLogService.AddEntry($"Upgrade: {upgradeId}");
+                _audioFeedbackController?.PlayUpgrade();
                 LogCurrentState();
             }
         }
@@ -190,8 +220,36 @@ namespace BastionUA.Bootstrap
             return _gameState.GetUpgradeLevel(upgradeId);
         }
 
+        public void RunPrestige()
+        {
+            if (_gameplayPaused)
+            {
+                return;
+            }
+
+            if (!_prestigeService.TryPrestige(_gameState, _mapService))
+            {
+                return;
+            }
+
+            _saveService.Save(_gameState);
+            _eventLogService.AddEntry($"Prestige L{_gameState.PrestigeLevel} activated.");
+            _audioFeedbackController?.PlayPrestige();
+            LogCurrentState();
+            TryQueueNextEvent(EventTriggerMode.OnSessionStart);
+        }
+
         private void ShowBattleResult(BattleResult result)
         {
+            if (result.IsVictory)
+            {
+                _audioFeedbackController?.PlayBattleVictory();
+            }
+            else
+            {
+                _audioFeedbackController?.PlayBattleDefeat();
+            }
+
             if (_battleResultPopupController == null)
             {
                 _battleResultPopupController = FindAnyObjectByType<BattleResultPopupController>();
@@ -224,6 +282,8 @@ namespace BastionUA.Bootstrap
                 _gameState = GameState.CreateDefault();
                 _gameState.Normalize();
                 _saveService.Save(_gameState);
+                _eventLogService.Clear();
+                _eventLogService.AddEntry("Save reset.");
                 LogCurrentState();
                 TryQueueNextEvent(EventTriggerMode.OnSessionStart);
                 Debug.Log("[GameBootstrap] Progress reset.");
@@ -282,8 +342,12 @@ namespace BastionUA.Bootstrap
         {
             if (FindAnyObjectByType<HudController>() != null &&
                 FindAnyObjectByType<EventPopupController>() != null &&
-                FindAnyObjectByType<BattleResultPopupController>() != null)
+                FindAnyObjectByType<BattleResultPopupController>() != null &&
+                FindAnyObjectByType<AudioFeedbackController>() != null)
             {
+                _eventPopupController = FindAnyObjectByType<EventPopupController>();
+                _battleResultPopupController = FindAnyObjectByType<BattleResultPopupController>();
+                _audioFeedbackController = FindAnyObjectByType<AudioFeedbackController>();
                 return;
             }
 
@@ -310,7 +374,13 @@ namespace BastionUA.Bootstrap
                 _battleResultPopupController = hudRoot.AddComponent<BattleResultPopupController>();
             }
 
-            Debug.Log("[GameBootstrap] HUD, event popup, and battle popup auto-created.");
+            _audioFeedbackController = hudRoot.GetComponent<AudioFeedbackController>();
+            if (_audioFeedbackController == null)
+            {
+                _audioFeedbackController = hudRoot.AddComponent<AudioFeedbackController>();
+            }
+
+            Debug.Log("[GameBootstrap] HUD, popups, and audio feedback auto-created.");
         }
 
         private void HandleDevKeyboardInput()
@@ -349,6 +419,11 @@ namespace BastionUA.Bootstrap
             {
                 SaveNow();
             }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                RunPrestige();
+            }
         }
 
         private static bool IsRegionSelectPressed(KeyCode primary, KeyCode keypad, KeyCode alternate)
@@ -361,7 +436,7 @@ namespace BastionUA.Bootstrap
             Debug.Log(
                 $"[GameState] Ammo={_gameState.Ammo}, Morale={_gameState.Morale}, " +
                 $"Selected={_gameState.LastSelectedRegionId}, Battles={_gameState.TotalBattles}, " +
-                $"Unit={_gameState.SelectedUnitId}");
+                $"Unit={_gameState.SelectedUnitId}, Prestige={_gameState.PrestigeLevel}");
 
             foreach (var region in _gameState.Regions)
             {

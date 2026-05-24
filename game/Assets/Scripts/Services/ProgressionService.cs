@@ -13,6 +13,9 @@ namespace BastionUA.Services
                 return modifiers;
             }
 
+            var prestigeService = new PrestigeService();
+            modifiers.PlayerDamageBonus += prestigeService.GetDamageBonus(state);
+
             var unit = UnitCatalog.GetById(state.SelectedUnitId) ?? UnitCatalog.GetDefault();
             modifiers.PlayerDamageBonus += unit.DamageBonus;
             modifiers.MoraleBonusOnVictory += unit.MoraleBonusOnVictory;

@@ -52,6 +52,7 @@ namespace BastionUA.Core
         public bool HasSeenOnboarding;
         public string SelectedUnitId;
         public List<UpgradeProgressState> UpgradeLevels = new List<UpgradeProgressState>();
+        public int PrestigeLevel;
 
         public void Normalize()
         {
@@ -63,6 +64,16 @@ namespace BastionUA.Core
             if (TotalBattles < 0)
             {
                 TotalBattles = 0;
+            }
+
+            if (PrestigeLevel < 0)
+            {
+                PrestigeLevel = 0;
+            }
+
+            if (PrestigeLevel > GameConstants.MaxPrestigeLevel)
+            {
+                PrestigeLevel = GameConstants.MaxPrestigeLevel;
             }
 
             if (Regions == null || Regions.Count == 0)
