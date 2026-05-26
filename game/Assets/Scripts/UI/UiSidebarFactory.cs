@@ -89,15 +89,20 @@ namespace BastionUA.UI
 
         public static void CreateFooterResetButton(Transform parent, Action onReset)
         {
-            var footerPanel = CreateInsetPanel(
-                parent,
-                "SidebarFooter",
-                new Vector2(0.06f, GameUiConstants.SidebarFooterBottomAnchor),
-                new Vector2(0.94f, GameUiConstants.SidebarFooterTopAnchor),
-                GameVisualPalette.SidebarFooter);
+            var footerObject = new GameObject("SidebarFooter", typeof(RectTransform), typeof(Image));
+            footerObject.transform.SetParent(parent, false);
+
+            var footerRect = footerObject.GetComponent<RectTransform>();
+            footerRect.anchorMin = new Vector2(0.06f, 0f);
+            footerRect.anchorMax = new Vector2(0.94f, 0f);
+            footerRect.pivot = new Vector2(0.5f, 0f);
+            footerRect.anchoredPosition = new Vector2(0f, GameUiConstants.SidebarFooterBottomPaddingPixels);
+            footerRect.sizeDelta = new Vector2(0f, GameUiConstants.SidebarFooterHeightPixels);
+            footerObject.GetComponent<Image>().color = GameVisualPalette.SidebarFooter;
+            footerObject.GetComponent<Image>().raycastTarget = false;
 
             UiButtonFactory.CreateFramedButton(
-                footerPanel,
+                footerObject.transform,
                 "ResetButton",
                 GameUiConstants.ButtonResetSave,
                 new Vector2(0.5f, 0.5f),

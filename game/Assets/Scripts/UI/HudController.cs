@@ -270,13 +270,18 @@ namespace BastionUA.UI
                 unitIndex++;
             }
 
-            CreateSectionTitle(legendPanel, "UpgradesTitle", GameUiConstants.LabelUpgrades, GameUiConstants.SidebarUpgradesTitleAnchor);
+            CreateSectionTitle(
+                legendPanel,
+                "UpgradesTitle",
+                GameUiConstants.LabelUpgrades,
+                GameUiConstants.GetSidebarUpgradesTitleAnchor(UpgradeCatalog.All.Count));
 
+            var upgradeCount = UpgradeCatalog.All.Count;
             var upgradeIndex = 0;
             foreach (var upgrade in UpgradeCatalog.All)
             {
-                var anchorY = GameUiConstants.SidebarUpgradeFirstAnchor -
-                                upgradeIndex * GameUiConstants.SidebarUpgradeRowSpacing;
+                var rowFromBottom = upgradeCount - 1 - upgradeIndex;
+                var anchorY = GameUiConstants.GetSidebarUpgradeRowAnchor(rowFromBottom);
                 var labelText = UiSidebarFactory.CreateUpgradeRow(
                     legendPanel,
                     upgrade.UpgradeId,

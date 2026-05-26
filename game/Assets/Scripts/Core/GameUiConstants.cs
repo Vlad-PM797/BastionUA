@@ -103,15 +103,43 @@ namespace BastionUA.Core
         public const float SidebarUnitsTitleAnchor = 0.52f;
         public const float SidebarUnitsFirstAnchor = 0.48f;
         public const float SidebarUnitsRowSpacing = 0.06f;
-        public const float SidebarUpgradesTitleAnchor = 0.24f;
         public const float SidebarUpgradeRowHeight = 34f;
-        public const float SidebarUpgradeRowSpacing = 0.065f;
-        public const float SidebarUpgradeFirstAnchor = 0.195f;
-        public const float SidebarFooterBottomAnchor = 0.01f;
-        public const float SidebarFooterTopAnchor = 0.065f;
+        public const float SidebarFooterHeightPixels = 40f;
+        public const float SidebarFooterBottomPaddingPixels = 8f;
+        public const float SidebarUpgradeBottomPaddingPixels = 14f;
+        public const float SidebarUpgradeStackSpacingPixels = 38f;
+        public const float SidebarUpgradesTitleGapPixels = 10f;
         public const float SidebarResetButtonWidth = 236f;
         public const float SidebarResetButtonHeight = 34f;
         public const float SidebarPurchaseButtonWidth = 48f;
+
+        public static float SidebarContentHeight =>
+            ReferenceHeight - BottomBarHeight - HudTopInset;
+
+        public static float GetSidebarUpgradeRowAnchor(int rowFromBottom)
+        {
+            var bottomOffset = SidebarFooterBottomPaddingPixels
+                + SidebarFooterHeightPixels
+                + SidebarUpgradeBottomPaddingPixels
+                + rowFromBottom * SidebarUpgradeStackSpacingPixels
+                + SidebarUpgradeRowHeight * 0.5f;
+            return bottomOffset / SidebarContentHeight;
+        }
+
+        public static float GetSidebarUpgradesTitleAnchor(int upgradeCount)
+        {
+            var topRowFromBottom = Mathf.Max(upgradeCount - 1, 0);
+            var topRowCenterPixels =
+                SidebarFooterBottomPaddingPixels
+                + SidebarFooterHeightPixels
+                + SidebarUpgradeBottomPaddingPixels
+                + topRowFromBottom * SidebarUpgradeStackSpacingPixels
+                + SidebarUpgradeRowHeight * 0.5f;
+            var titleAnchorPixels = topRowCenterPixels
+                + SidebarUpgradeRowHeight * 0.5f
+                + SidebarUpgradesTitleGapPixels;
+            return titleAnchorPixels / SidebarContentHeight;
+        }
 
         public const float HudStatIconSize = 22f;
         public const float HudStatIconTextOffset = 0.024f;
