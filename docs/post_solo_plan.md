@@ -21,7 +21,7 @@ Team-scale roadmap: [01_mvp_roadmap.md](./01_mvp_roadmap.md).
 ## Фаза A — Playtest & polish
 
 ### A1. Підготовка (solo, 1 день)
-- [ ] **Build Windows Release** → **Package Windows Release Demo**
+- [x] **Build Windows Release** → **Package Windows Release Demo**
 - [ ] (Optional) **Build Android Dev** → APK для мобільних тестерів
 - [x] Local playtest metrics (`PlaytestMetricsService` → `bastionua_playtest_metrics.json`)
 - [x] Real SFX drop-in folder (`Assets/Resources/Audio/` — fallback to procedural)

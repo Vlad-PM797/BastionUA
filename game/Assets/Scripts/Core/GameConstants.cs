@@ -49,6 +49,10 @@ namespace BastionUA.Core
         public const int EventLogMaxEntries = 5;
         public const int EventLogDisplayLines = 3;
 
+        public const string ScreenshotCommandLineArg = "-bastionScreenshotPath";
+        public const float ScreenshotCaptureDelaySeconds = 1.5f;
+        public const float ScreenshotQuitDelaySeconds = 0.75f;
+
         public const int SfxSampleRate = 44100;
         public const float SfxMasterVolume = 0.35f;
         public const float SfxTapFrequencyHz = 520f;

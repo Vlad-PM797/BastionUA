@@ -76,6 +76,7 @@ namespace BastionUA.Bootstrap
         private void Start()
         {
             TryQueueNextEvent(EventTriggerMode.OnSessionStart);
+            GameScreenshotUtility.TryScheduleCapture(this);
         }
 
         private void Update()

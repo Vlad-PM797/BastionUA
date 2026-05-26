@@ -81,8 +81,8 @@
 **Phase A DoD:**
 - [x] Play mode: visible feedback on tap, battle, region select
 - [x] Popups fade in
-- [ ] Batchmode verification passes
-- [ ] Screenshot «before/after» у `docs/visual/`
+- [x] Batchmode verification passes
+- [x] Screenshot «before/after» у `docs/visual/`
 
 ---
 
