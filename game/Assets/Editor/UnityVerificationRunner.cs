@@ -27,6 +27,8 @@ namespace BastionUA.EditorTools
                 failures += VerifyResourceLoop() ? 0 : 1;
                 failures += VerifyMapSelection() ? 0 : 1;
                 failures += VerifyBattleChangesRegionState() ? 0 : 1;
+                failures += VerifyBattlePreview() ? 0 : 1;
+                failures += VerifyBattleCombatLog() ? 0 : 1;
                 failures += VerifyKharkivRegionMigration() ? 0 : 1;
                 failures += VerifyBattleBalanceScalesByRegion() ? 0 : 1;
                 failures += VerifyProgressionModifiers() ? 0 : 1;
@@ -35,9 +37,11 @@ namespace BastionUA.EditorTools
                 failures += VerifyBootScenePlayModeBootstrap() ? 0 : 1;
                 failures += VerifyHudBootstrap() ? 0 : 1;
                 failures += VerifyHostomelEventFlow() ? 0 : 1;
+                failures += VerifyEventJsonContent() ? 0 : 1;
                 failures += VerifyChornobaivkaEventFlow() ? 0 : 1;
                 failures += VerifyIrpinEventFlow() ? 0 : 1;
                 failures += VerifyKharkivEventFlow() ? 0 : 1;
+                failures += VerifyChernihivEventFlow() ? 0 : 1;
                 failures += VerifyVisualPaletteAssets() ? 0 : 1;
                 failures += VerifyMapArtResource() ? 0 : 1;
                 failures += VerifyPrestigeFlow() ? 0 : 1;
@@ -149,6 +153,75 @@ namespace BastionUA.EditorTools
             }
 
             Debug.Log("[UnityVerification] Battle state transition OK.");
+            return true;
+        }
+
+        private static bool VerifyBattlePreview()
+        {
+            var state = GameState.CreateDefault();
+            state.Ammo = 200;
+            var mapService = new MapService();
+            var previewService = new BattlePreviewService();
+            var modifiers = new BattleModifiers();
+            var region = mapService.GetRegion(state, RegionCatalog.KyivId);
+
+            var preview = previewService.BuildPreview(state, region, modifiers);
+            var expectedAmmo = BattleService.ResolveAmmoBudget(state, modifiers);
+
+            if (preview.AmmoCost != expectedAmmo)
+            {
+                Debug.LogError(
+                    $"[UnityVerification] Battle preview ammo mismatch. Expected {expectedAmmo}, got {preview.AmmoCost}.");
+                return false;
+            }
+
+            if (!preview.CanAfford || preview.EnemyHp <= 0 || preview.PlayerDamagePerRound <= 0)
+            {
+                Debug.LogError("[UnityVerification] Battle preview stats invalid.");
+                return false;
+            }
+
+            if (preview.EstimatedRoundsToWin <= 0)
+            {
+                Debug.LogError("[UnityVerification] Battle preview estimated rounds invalid.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Battle preview OK.");
+            return true;
+        }
+
+        private static bool VerifyBattleCombatLog()
+        {
+            var state = GameState.CreateDefault();
+            state.Ammo = 200;
+            var mapService = new MapService();
+            var battleService = new BattleService();
+            var region = mapService.GetRegion(state, RegionCatalog.KyivId);
+            var modifiers = new BattleModifiers();
+            var expectedAmmo = BattleService.ResolveAmmoBudget(state, modifiers);
+
+            var result = battleService.Simulate(state, region, modifiers);
+
+            if (result.CombatLog == null || result.CombatLog.Count == 0)
+            {
+                Debug.LogError("[UnityVerification] Battle combat log should contain at least one round.");
+                return false;
+            }
+
+            if (result.RoundsFought <= 0)
+            {
+                Debug.LogError("[UnityVerification] Battle rounds fought should be greater than zero.");
+                return false;
+            }
+
+            if (result.AmmoSpent != expectedAmmo)
+            {
+                Debug.LogError("[UnityVerification] Battle ammo spent does not match preview budget.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Battle combat log OK.");
             return true;
         }
 
@@ -429,6 +502,47 @@ namespace BastionUA.EditorTools
             return true;
         }
 
+        private static bool VerifyEventJsonContent()
+        {
+            GameEventRegistry.EnsureLoaded();
+            var schedule = GameEventRegistry.GetSchedule();
+            if (schedule == null || schedule.Count < 5)
+            {
+                Debug.LogError("[UnityVerification] Event JSON schedule should contain at least five entries.");
+                return false;
+            }
+
+            var hostomelFromJson = GameEventRegistry.CreateDefinition(HostomelEventCatalog.EventId);
+            var hostomelFromCatalog = HostomelEventCatalog.Create();
+            if (hostomelFromJson == null ||
+                hostomelFromJson.Title != hostomelFromCatalog.Title ||
+                hostomelFromJson.Choices.Count != hostomelFromCatalog.Choices.Count)
+            {
+                Debug.LogError("[UnityVerification] Hostomel JSON definition mismatch.");
+                return false;
+            }
+
+            var prestigeRequired = GameEventRegistry.GetPrestigeRequiredEventIds();
+            if (prestigeRequired == null || prestigeRequired.Count < 5)
+            {
+                Debug.LogError("[UnityVerification] Prestige-required events should come from JSON schedule.");
+                return false;
+            }
+
+            var state = GameState.CreateDefault();
+            state.Normalize();
+            var triggerService = new EventTriggerService();
+            var firstEvent = triggerService.GetNextEvent(state, EventTriggerMode.OnSessionStart);
+            if (firstEvent == null || firstEvent.EventId != HostomelEventCatalog.EventId)
+            {
+                Debug.LogError("[UnityVerification] JSON-backed schedule should queue Hostomel on session start.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Event JSON content OK.");
+            return true;
+        }
+
         private static bool VerifyChornobaivkaEventFlow()
         {
             var state = GameState.CreateDefault();
@@ -562,14 +676,75 @@ namespace BastionUA.EditorTools
 
             state.HasSeenOnboarding = true;
             var hint = ObjectiveHintService.GetHint(state);
-            if (hint != GameUiConstants.ObjectiveLiberateRegions &&
-                hint != GameUiConstants.ObjectiveProgression)
+            if (hint != GameUiConstants.ObjectiveFourthBattle)
             {
-                Debug.LogError("[UnityVerification] Unexpected objective hint after Kharkiv event.");
+                Debug.LogError("[UnityVerification] Objective hint should require fourth battle after Kharkiv.");
                 return false;
             }
 
             Debug.Log("[UnityVerification] Kharkiv event flow OK.");
+            return true;
+        }
+
+        private static bool VerifyChernihivEventFlow()
+        {
+            var state = GameState.CreateDefault();
+            state.Normalize();
+            var mapService = new MapService();
+            var eventService = new EventService();
+            var triggerService = new EventTriggerService();
+
+            state.MarkEventCompleted(HostomelEventCatalog.EventId);
+            state.MarkEventCompleted(ChornobaivkaEventCatalog.EventId);
+            state.MarkEventCompleted(IrpinEventCatalog.EventId);
+            state.MarkEventCompleted(KharkivEventCatalog.EventId);
+            state.TotalBattles = GameConstants.KharkivMinBattleCount;
+
+            if (triggerService.GetNextEvent(state, EventTriggerMode.OnProgress) != null)
+            {
+                Debug.LogError("[UnityVerification] Chernihiv should wait for fourth battle.");
+                return false;
+            }
+
+            state.TotalBattles = GameConstants.ChernihivMinBattleCount;
+            var chernihivEvent = triggerService.GetNextEvent(state, EventTriggerMode.OnProgress);
+            if (chernihivEvent == null || chernihivEvent.EventId != ChernihivEventCatalog.EventId)
+            {
+                Debug.LogError("[UnityVerification] Chernihiv should be ready after Kharkiv + 4 battles.");
+                return false;
+            }
+
+            var chernihivBefore = mapService.GetRegion(state, ChernihivEventCatalog.TargetRegionId);
+            var statusBefore = chernihivBefore.Status;
+
+            if (!eventService.TryApplyChoice(state, mapService, chernihivEvent, 0, out _))
+            {
+                Debug.LogError("[UnityVerification] Chernihiv choice apply failed.");
+                return false;
+            }
+
+            if (!state.IsEventCompleted(ChernihivEventCatalog.EventId))
+            {
+                Debug.LogError("[UnityVerification] Chernihiv not marked completed.");
+                return false;
+            }
+
+            if (chernihivBefore.Status == statusBefore)
+            {
+                Debug.LogError("[UnityVerification] Chernihiv event should improve region status.");
+                return false;
+            }
+
+            state.HasSeenOnboarding = true;
+            var hint = ObjectiveHintService.GetHint(state);
+            if (hint != GameUiConstants.ObjectiveLiberateRegions &&
+                hint != GameUiConstants.ObjectiveProgression)
+            {
+                Debug.LogError("[UnityVerification] Unexpected objective hint after Chernihiv event.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] Chernihiv event flow OK.");
             return true;
         }
 
@@ -639,6 +814,7 @@ namespace BastionUA.EditorTools
             state.MarkEventCompleted(ChornobaivkaEventCatalog.EventId);
             state.MarkEventCompleted(IrpinEventCatalog.EventId);
             state.MarkEventCompleted(KharkivEventCatalog.EventId);
+            state.MarkEventCompleted(ChernihivEventCatalog.EventId);
 
             foreach (var region in state.Regions)
             {

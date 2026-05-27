@@ -27,8 +27,22 @@ namespace BastionUA.Core
         public const string BattleLabelHp = "HP (you / enemy)";
         public const string BattleLabelRegionStatus = "Region status";
         public const string BattleContinueButton = "Continue";
+        public const string BattleConfirmTitle = "Confirm Battle";
+        public const string BattleConfirmFightButton = "Fight";
+        public const string BattleConfirmCancelButton = "Cancel";
+        public const string BattleConfirmAmmoCost = "Ammo cost";
+        public const string BattleConfirmEnemyHp = "Enemy HP";
+        public const string BattleConfirmYourDamage = "Your damage / round";
+        public const string BattleConfirmEnemyDamage = "Enemy damage / round";
+        public const string BattleConfirmEstimatedRounds = "Est. rounds to win";
+        public const string BattleConfirmInsufficientAmmo = "Need at least {0} ammo to fight";
+        public const string BattleLabelCombatLog = "Combat log";
+        public const string BattleLogRoundFormat = "R{0}: dealt {1}, took {2} ({3}/{4} HP)";
+        public const string BattleLogTruncatedFormat = "... +{0} more rounds";
         public const float BattlePanelWidth = 680f;
-        public const float BattlePanelHeight = 360f;
+        public const float BattlePanelHeight = 420f;
+        public const float BattleConfirmPanelWidth = 680f;
+        public const float BattleConfirmPanelHeight = 380f;
 
         public const string LabelUnits = "Units";
         public const string LabelUpgrades = "Upgrades";
@@ -56,6 +70,8 @@ namespace BastionUA.Core
         public const string ObjectiveIrpinPending = "\u041f\u0440\u0438\u0439\u043c\u0438 \u0440\u0456\u0448\u0435\u043d\u043d\u044f \u0443 \u043f\u043e\u0434\u0456\u0457 \u00ab\u0406\u0440\u043f\u0456\u043d\u044c\u00bb.";
         public const string ObjectiveThirdBattle = "\u041f\u0440\u043e\u0432\u0435\u0434\u0438 \u0449\u0435 1 \u0431\u0456\u0439 \u0434\u043b\u044f \u043f\u043e\u0434\u0456\u0457 \u00ab\u0425\u0430\u0440\u043a\u0456\u0432\u00bb.";
         public const string ObjectiveKharkivEventPending = "\u041f\u0440\u0438\u0439\u043c\u0438 \u0440\u0456\u0448\u0435\u043d\u043d\u044f \u0443 \u043f\u043e\u0434\u0456\u0457 \u00ab\u0425\u0430\u0440\u043a\u0456\u0432\u00bb.";
+        public const string ObjectiveFourthBattle = "\u041f\u0440\u043e\u0432\u0435\u0434\u0438 \u0449\u0435 1 \u0431\u0456\u0439 \u0434\u043b\u044f \u043f\u043e\u0434\u0456\u0457 \u00ab\u0427\u0435\u0440\u043d\u0456\u0433\u0456\u0432\u00bb.";
+        public const string ObjectiveChernihivPending = "\u041f\u0440\u0438\u0439\u043c\u0438 \u0440\u0456\u0448\u0435\u043d\u043d\u044f \u0443 \u043f\u043e\u0434\u0456\u0457 \u00ab\u0427\u0435\u0440\u043d\u0456\u0433\u0456\u0432\u00bb.";
         public const string ObjectiveExpandTerritory = "\u0423\u0441\u0456 \u043f\u043e\u0434\u0456\u0457 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u043e. \u041f\u043e\u0441\u0438\u043b\u044c \u0440\u0435\u0433\u0456\u043e\u043d\u0438 \u0431\u043e\u044f\u043c\u0438.";
         public const string ObjectiveProgression = "\u041e\u0431\u0435\u0440\u0438 \u043f\u0456\u0434\u0440\u043e\u0437\u0434\u0456\u043b \u0456 \u043a\u0443\u043f\u0438 \u0430\u043f\u0433\u0440\u0435\u0439\u0434 \u0434\u043b\u044f \u0441\u0438\u043b\u044c\u043d\u0456\u0448\u0438\u0445 \u0431\u043e\u0457\u0432.";
         public const string ObjectiveKharkiv = "\u0417\u0432\u0456\u043b\u044c\u043d\u0438 Kharkiv \u0431\u043e\u044f\u043c \u043d\u0430 \u043a\u0430\u0440\u0442\u0456.";

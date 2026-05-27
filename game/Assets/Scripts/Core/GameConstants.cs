@@ -10,6 +10,7 @@ namespace BastionUA.Core
         public const int TapAmmoGain = 5;
 
         public const string SaveFileName = "bastionua_save.json";
+        public const string EventContentResourcePath = "Events/story_events";
 
         public const int BattleBaseEnemyHp = 120;
         public const int BattleBaseEnemyDamage = 8;
@@ -20,6 +21,7 @@ namespace BastionUA.Core
         public const int BattleVictoryMoraleGain = 5;
         public const int BattleDefeatMoraleLoss = 3;
         public const int BattleMaxRounds = 20;
+        public const int BattleLogMaxLines = 5;
         public const int BattleAmmoDamageDivisor = 5;
         public const int BattleOccupiedEnemyHpBonus = 12;
         public const int BattleOccupiedEnemyDamageBonus = 4;
@@ -40,6 +42,7 @@ namespace BastionUA.Core
         public const int ChornobaivkaMinBattleCount = 1;
         public const int IrpinMinBattleCount = 2;
         public const int KharkivMinBattleCount = 3;
+        public const int ChernihivMinBattleCount = 4;
 
         public const int MaxPrestigeLevel = 5;
         public const int PrestigeDamageBonusPerLevel = 3;

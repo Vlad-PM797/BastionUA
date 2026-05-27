@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BastionUA.Core;
 using UnityEngine;
 
@@ -9,14 +10,35 @@ namespace BastionUA.Services
         public int AmmoSpent;
         public int PlayerHpRemaining;
         public int EnemyHpRemaining;
+        public int RoundsFought;
         public string RegionDisplayName;
         public RegionStatus RegionStatusBefore;
         public RegionStatus RegionStatusAfter;
+        public List<string> CombatLog = new List<string>();
     }
 
     public sealed class BattleService
     {
         private readonly BattleBalanceService _balanceService = new BattleBalanceService();
+
+        public static int ResolveAmmoBudget(GameState state, BattleModifiers modifiers)
+        {
+            var safeModifiers = modifiers ?? new BattleModifiers();
+            var ammoBudget = Mathf.Min(state.Ammo, GameConstants.BattleMaxAmmoBudget);
+            return Mathf.Max(
+                GameConstants.BattleMinAmmoBudget,
+                ammoBudget - safeModifiers.AmmoBudgetReduction);
+        }
+
+        public static int ResolvePlayerDamage(GameState state, int ammoBudget, BattleModifiers modifiers)
+        {
+            var safeModifiers = modifiers ?? new BattleModifiers();
+            var balanceService = new BattleBalanceService();
+            var playerDamage = GameConstants.BattleBasePlayerDamage +
+                               (ammoBudget / GameConstants.BattleAmmoDamageDivisor) +
+                               safeModifiers.PlayerDamageBonus;
+            return balanceService.ApplyMoraleToPlayerDamage(playerDamage, state.Morale);
+        }
 
         public BattleResult Simulate(GameState state, RegionState region, BattleModifiers modifiers)
         {
@@ -33,16 +55,8 @@ namespace BastionUA.Services
                 RegionStatusAfter = region.Status
             };
 
-            var ammoBudget = Mathf.Min(state.Ammo, GameConstants.BattleMaxAmmoBudget);
-            ammoBudget = Mathf.Max(
-                GameConstants.BattleMinAmmoBudget,
-                ammoBudget - safeModifiers.AmmoBudgetReduction);
-
-            var playerDamage = GameConstants.BattleBasePlayerDamage +
-                               (ammoBudget / GameConstants.BattleAmmoDamageDivisor) +
-                               safeModifiers.PlayerDamageBonus;
-            playerDamage = _balanceService.ApplyMoraleToPlayerDamage(playerDamage, state.Morale);
-
+            var ammoBudget = ResolveAmmoBudget(state, safeModifiers);
+            var playerDamage = ResolvePlayerDamage(state, ammoBudget, safeModifiers);
             var enemyDamage = _balanceService.GetEnemyDamage(region, safeModifiers);
 
             var rounds = 0;
@@ -58,6 +72,25 @@ namespace BastionUA.Services
 
                 result.PlayerHpRemaining -= enemyDamage;
                 rounds++;
+
+                if (result.CombatLog.Count < GameConstants.BattleLogMaxLines)
+                {
+                    result.CombatLog.Add(string.Format(
+                        GameUiConstants.BattleLogRoundFormat,
+                        rounds,
+                        playerDamage,
+                        enemyDamage,
+                        result.PlayerHpRemaining,
+                        result.EnemyHpRemaining));
+                }
+            }
+
+            result.RoundsFought = rounds;
+            if (rounds > GameConstants.BattleLogMaxLines)
+            {
+                result.CombatLog.Add(string.Format(
+                    GameUiConstants.BattleLogTruncatedFormat,
+                    rounds - GameConstants.BattleLogMaxLines));
             }
 
             result.IsVictory = result.EnemyHpRemaining <= 0 && result.PlayerHpRemaining > 0;

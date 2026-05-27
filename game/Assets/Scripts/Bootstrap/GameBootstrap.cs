@@ -11,6 +11,7 @@ namespace BastionUA.Bootstrap
         private ResourceService _resourceService;
         private MapService _mapService;
         private BattleService _battleService;
+        private BattlePreviewService _battlePreviewService;
         private EventService _eventService;
         private EventTriggerService _eventTriggerService;
         private ProgressionService _progressionService;
@@ -19,6 +20,7 @@ namespace BastionUA.Bootstrap
         private PlaytestMetricsService _playtestMetricsService;
         private EventPopupController _eventPopupController;
         private BattleResultPopupController _battleResultPopupController;
+        private BattleConfirmPopupController _battleConfirmPopupController;
         private AudioFeedbackController _audioFeedbackController;
         private GameState _gameState;
 
@@ -56,6 +58,7 @@ namespace BastionUA.Bootstrap
             _resourceService = new ResourceService();
             _mapService = new MapService();
             _battleService = new BattleService();
+            _battlePreviewService = new BattlePreviewService();
             _eventService = new EventService();
             _eventTriggerService = new EventTriggerService();
             _progressionService = new ProgressionService();
@@ -63,6 +66,7 @@ namespace BastionUA.Bootstrap
             _eventLogService = new EventLogService();
             _playtestMetricsService = new PlaytestMetricsService();
 
+            GameEventRegistry.EnsureLoaded();
             _gameState = _saveService.LoadOrCreate();
             _gameState.Normalize();
             EnsureHud();
@@ -178,6 +182,46 @@ namespace BastionUA.Bootstrap
             }
 
             var modifiers = _progressionService.GetBattleModifiers(_gameState);
+            var preview = _battlePreviewService.BuildPreview(_gameState, region, modifiers);
+            if (!preview.CanAfford)
+            {
+                Debug.LogWarning(
+                    $"[GameBootstrap] Cannot start battle. Need at least {GameConstants.BattleMinAmmoBudget} ammo.");
+                return;
+            }
+
+            ShowBattleConfirm(preview, region.RegionId, modifiers);
+        }
+
+        private void ShowBattleConfirm(BattlePreview preview, string regionId, BattleModifiers modifiers)
+        {
+            if (_battleConfirmPopupController == null)
+            {
+                _battleConfirmPopupController = FindAnyObjectByType<BattleConfirmPopupController>();
+            }
+
+            if (_battleConfirmPopupController == null)
+            {
+                Debug.LogWarning("[GameBootstrap] BattleConfirmPopupController not found. Running battle immediately.");
+                ExecuteBattle(regionId, modifiers);
+                return;
+            }
+
+            _battleConfirmPopupController.ShowBattleConfirm(
+                preview,
+                () => ExecuteBattle(regionId, modifiers),
+                null);
+        }
+
+        private void ExecuteBattle(string regionId, BattleModifiers modifiers)
+        {
+            var region = _mapService.GetRegion(_gameState, regionId);
+            if (region == null)
+            {
+                Debug.LogWarning("[GameBootstrap] Cannot execute battle. Region not found.");
+                return;
+            }
+
             var result = _battleService.Simulate(_gameState, region, modifiers);
             _gameState.TotalBattles++;
             MarkOnboardingSeen();
@@ -372,10 +416,12 @@ namespace BastionUA.Bootstrap
             if (FindAnyObjectByType<HudController>() != null &&
                 FindAnyObjectByType<EventPopupController>() != null &&
                 FindAnyObjectByType<BattleResultPopupController>() != null &&
+                FindAnyObjectByType<BattleConfirmPopupController>() != null &&
                 FindAnyObjectByType<AudioFeedbackController>() != null)
             {
                 _eventPopupController = FindAnyObjectByType<EventPopupController>();
                 _battleResultPopupController = FindAnyObjectByType<BattleResultPopupController>();
+                _battleConfirmPopupController = FindAnyObjectByType<BattleConfirmPopupController>();
                 _audioFeedbackController = FindAnyObjectByType<AudioFeedbackController>();
                 return;
             }
@@ -401,6 +447,12 @@ namespace BastionUA.Bootstrap
             if (_battleResultPopupController == null)
             {
                 _battleResultPopupController = hudRoot.AddComponent<BattleResultPopupController>();
+            }
+
+            _battleConfirmPopupController = hudRoot.GetComponent<BattleConfirmPopupController>();
+            if (_battleConfirmPopupController == null)
+            {
+                _battleConfirmPopupController = hudRoot.AddComponent<BattleConfirmPopupController>();
             }
 
             _audioFeedbackController = hudRoot.GetComponent<AudioFeedbackController>();

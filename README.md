@@ -22,7 +22,7 @@
 ## Що вже працює в build
 
 - Карта UA (4 регіони) + tap/auto resources + auto-battle  
-- 4 story events: Hostomel → Chornobaivka → Irpin → Kharkiv  
+- 5 story events (JSON): Hostomel → Chornobaivka → Irpin → Kharkiv → Chernihiv  
 - Units, upgrades, event log, prestige (L5)  
 - Save/load · кнопка **«Вихід»** (save перед закриттям)  
 - Demo zip для зовнішніх тестерів  

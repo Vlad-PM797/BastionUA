@@ -1,0 +1,156 @@
+{
+  "schedule": [
+    {
+      "EventId": "hostomel",
+      "TriggerMode": 0,
+      "RequiredCompletedEventIds": [],
+      "MinBattleCount": 0,
+      "RequiredForPrestige": true
+    },
+    {
+      "EventId": "chornobaivka",
+      "TriggerMode": 1,
+      "RequiredCompletedEventIds": ["hostomel"],
+      "MinBattleCount": 1,
+      "RequiredForPrestige": true
+    },
+    {
+      "EventId": "irpin",
+      "TriggerMode": 1,
+      "RequiredCompletedEventIds": ["chornobaivka"],
+      "MinBattleCount": 2,
+      "RequiredForPrestige": true
+    },
+    {
+      "EventId": "kharkiv",
+      "TriggerMode": 1,
+      "RequiredCompletedEventIds": ["irpin"],
+      "MinBattleCount": 3,
+      "RequiredForPrestige": true
+    },
+    {
+      "EventId": "chernihiv",
+      "TriggerMode": 1,
+      "RequiredCompletedEventIds": ["kharkiv"],
+      "MinBattleCount": 4,
+      "RequiredForPrestige": true
+    }
+  ],
+  "definitions": [
+    {
+      "EventId": "hostomel",
+      "Title": "Гостомель",
+      "Description": "Ворог намагається захопити аеропорт. Командування чекає на твоє рішення.",
+      "Choices": [
+        {
+          "ChoiceId": "hold_airport",
+          "Label": "Утримати позиції",
+          "AmmoDelta": -20,
+          "MoraleDelta": 10,
+          "TargetRegionId": "kyiv",
+          "RegionStatusStep": 1
+        },
+        {
+          "ChoiceId": "tactical_retreat",
+          "Label": "Відступити та перегрупуватись",
+          "AmmoDelta": 15,
+          "MoraleDelta": -8,
+          "TargetRegionId": "kyiv",
+          "RegionStatusStep": -1
+        }
+      ]
+    },
+    {
+      "EventId": "chornobaivka",
+      "Title": "Чорнобаївка",
+      "Description": "Колона бронетехніки рухається південним напрямком. Ударити зараз чи зберегти ресурси?",
+      "Choices": [
+        {
+          "ChoiceId": "artillery_strike",
+          "Label": "Артилерійський удар",
+          "AmmoDelta": -25,
+          "MoraleDelta": 12,
+          "TargetRegionId": "sumy",
+          "RegionStatusStep": 1
+        },
+        {
+          "ChoiceId": "conserve_ammo",
+          "Label": "Зберегти боєприпаси",
+          "AmmoDelta": 10,
+          "MoraleDelta": -6,
+          "TargetRegionId": "sumy",
+          "RegionStatusStep": -1
+        }
+      ]
+    },
+    {
+      "EventId": "irpin",
+      "Title": "Ірпінь",
+      "Description": "Окупанти тиснуть на передмістя Києва. Евакуювати цивільних чи тримати оборону?",
+      "Choices": [
+        {
+          "ChoiceId": "evacuate_civilians",
+          "Label": "Евакуювати цивільних",
+          "AmmoDelta": -15,
+          "MoraleDelta": 12,
+          "TargetRegionId": "kyiv",
+          "RegionStatusStep": 1
+        },
+        {
+          "ChoiceId": "hold_the_line",
+          "Label": "Тримати лінію оборони",
+          "AmmoDelta": -25,
+          "MoraleDelta": 8,
+          "TargetRegionId": "kyiv",
+          "RegionStatusStep": 1
+        }
+      ]
+    },
+    {
+      "EventId": "kharkiv",
+      "Title": "Харків",
+      "Description": "Окупанти тиснуть на схід. Контратакувати чи зміцнити оборону міста?",
+      "Choices": [
+        {
+          "ChoiceId": "counterattack",
+          "Label": "Контратака на фланзі",
+          "AmmoDelta": -30,
+          "MoraleDelta": 12,
+          "TargetRegionId": "kharkiv",
+          "RegionStatusStep": -1
+        },
+        {
+          "ChoiceId": "fortify_defense",
+          "Label": "Укріпити оборону",
+          "AmmoDelta": -15,
+          "MoraleDelta": 6,
+          "TargetRegionId": "kharkiv",
+          "RegionStatusStep": -1
+        }
+      ]
+    },
+    {
+      "EventId": "chernihiv",
+      "Title": "Чернігів",
+      "Description": "Північний фланг під облогою. Пробити коридор постачання чи утримати оборону міста?",
+      "Choices": [
+        {
+          "ChoiceId": "supply_breakthrough",
+          "Label": "Пробити коридор постачання",
+          "AmmoDelta": -22,
+          "MoraleDelta": 14,
+          "TargetRegionId": "chernihiv",
+          "RegionStatusStep": -1
+        },
+        {
+          "ChoiceId": "hold_the_siege",
+          "Label": "Утримати оборону",
+          "AmmoDelta": -12,
+          "MoraleDelta": 9,
+          "TargetRegionId": "chernihiv",
+          "RegionStatusStep": -1
+        }
+      ]
+    }
+  ]
+}

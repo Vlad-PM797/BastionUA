@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BastionUA.Bootstrap;
 using BastionUA.Core;
 using BastionUA.Services;
@@ -104,7 +105,7 @@ namespace BastionUA.UI
                 "BattleBody",
                 BuildBodyText(result),
                 new Vector2(0f, -128f),
-                new Vector2(640f, 180f));
+                new Vector2(640f, 240f));
 
             var continueButton = PopupUiFactory.CreatePrimaryButton(
                 panelObject.transform,
@@ -116,13 +117,22 @@ namespace BastionUA.UI
 
         private static string BuildBodyText(BattleResult result)
         {
-            var statusLine = $"{GameUiConstants.BattleLabelRegionStatus}: {result.RegionStatusBefore} → {result.RegionStatusAfter}";
-            return string.Join(
-                "\n",
+            var lines = new List<string>
+            {
                 $"{GameUiConstants.BattleLabelRegion}: {result.RegionDisplayName}",
                 $"{GameUiConstants.BattleLabelAmmoSpent}: {result.AmmoSpent}",
                 $"{GameUiConstants.BattleLabelHp}: {result.PlayerHpRemaining} / {result.EnemyHpRemaining}",
-                statusLine);
+                $"{GameUiConstants.BattleLabelRegionStatus}: {result.RegionStatusBefore} → {result.RegionStatusAfter}"
+            };
+
+            if (result.CombatLog != null && result.CombatLog.Count > 0)
+            {
+                lines.Add(string.Empty);
+                lines.Add(GameUiConstants.BattleLabelCombatLog + ":");
+                lines.AddRange(result.CombatLog);
+            }
+
+            return string.Join("\n", lines);
         }
 
         private void ClosePopup()

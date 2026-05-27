@@ -6,13 +6,28 @@ namespace BastionUA.Services
 {
     public sealed class PrestigeService
     {
-        private static readonly string[] RequiredEventIds =
+        private static string[] GetRequiredEventIds()
         {
-            HostomelEventCatalog.EventId,
-            ChornobaivkaEventCatalog.EventId,
-            IrpinEventCatalog.EventId,
-            KharkivEventCatalog.EventId
-        };
+            var fromRegistry = GameEventRegistry.GetPrestigeRequiredEventIds();
+            if (fromRegistry == null || fromRegistry.Count == 0)
+            {
+                return new[]
+                {
+                    HostomelEventCatalog.EventId,
+                    ChornobaivkaEventCatalog.EventId,
+                    IrpinEventCatalog.EventId,
+                    KharkivEventCatalog.EventId
+                };
+            }
+
+            var ids = new string[fromRegistry.Count];
+            for (var index = 0; index < fromRegistry.Count; index++)
+            {
+                ids[index] = fromRegistry[index];
+            }
+
+            return ids;
+        }
 
         public bool CanPrestige(GameState state)
         {
@@ -64,7 +79,7 @@ namespace BastionUA.Services
 
         private static bool AreAllStoryEventsCompleted(GameState state)
         {
-            foreach (var eventId in RequiredEventIds)
+            foreach (var eventId in GetRequiredEventIds())
             {
                 if (!state.IsEventCompleted(eventId))
                 {

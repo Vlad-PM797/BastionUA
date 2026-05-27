@@ -4,66 +4,37 @@ namespace BastionUA.Core
 {
     public static class GameEventRegistry
     {
-        private static readonly GameEventScheduleEntry[] Schedule =
+        private static EventContentCache _cache;
+        private static readonly EventCatalogLoader Loader = new EventCatalogLoader();
+
+        public static void EnsureLoaded()
         {
-            new GameEventScheduleEntry
-            {
-                EventId = HostomelEventCatalog.EventId,
-                TriggerMode = EventTriggerMode.OnSessionStart,
-                RequiredCompletedEventIds = new string[0],
-                MinBattleCount = 0
-            },
-            new GameEventScheduleEntry
-            {
-                EventId = ChornobaivkaEventCatalog.EventId,
-                TriggerMode = EventTriggerMode.OnProgress,
-                RequiredCompletedEventIds = new[] { HostomelEventCatalog.EventId },
-                MinBattleCount = GameConstants.ChornobaivkaMinBattleCount
-            },
-            new GameEventScheduleEntry
-            {
-                EventId = IrpinEventCatalog.EventId,
-                TriggerMode = EventTriggerMode.OnProgress,
-                RequiredCompletedEventIds = new[] { ChornobaivkaEventCatalog.EventId },
-                MinBattleCount = GameConstants.IrpinMinBattleCount
-            },
-            new GameEventScheduleEntry
-            {
-                EventId = KharkivEventCatalog.EventId,
-                TriggerMode = EventTriggerMode.OnProgress,
-                RequiredCompletedEventIds = new[] { IrpinEventCatalog.EventId },
-                MinBattleCount = GameConstants.KharkivMinBattleCount
-            }
-        };
+            _ = GetCache();
+        }
 
         public static IReadOnlyList<GameEventScheduleEntry> GetSchedule()
         {
-            return Schedule;
+            return GetCache().Schedule;
+        }
+
+        public static IReadOnlyList<string> GetPrestigeRequiredEventIds()
+        {
+            return GetCache().PrestigeRequiredEventIds;
         }
 
         public static EventDefinition CreateDefinition(string eventId)
         {
-            if (eventId == HostomelEventCatalog.EventId)
+            return GetCache().GetDefinition(eventId);
+        }
+
+        private static EventContentCache GetCache()
+        {
+            if (_cache == null)
             {
-                return HostomelEventCatalog.Create();
+                _cache = Loader.Load();
             }
 
-            if (eventId == ChornobaivkaEventCatalog.EventId)
-            {
-                return ChornobaivkaEventCatalog.Create();
-            }
-
-            if (eventId == IrpinEventCatalog.EventId)
-            {
-                return IrpinEventCatalog.Create();
-            }
-
-            if (eventId == KharkivEventCatalog.EventId)
-            {
-                return KharkivEventCatalog.Create();
-            }
-
-            return null;
+            return _cache;
         }
     }
 }
