@@ -21,7 +21,8 @@ namespace BastionUA.UI
             var polygon = BuildPixelPolygon(MapUiConstants.UkraineSilhouettePoints, width, height);
             var pixels = new Color32[width * height];
             var transparent = new Color32(0, 0, 0, 0);
-            var isEnhanced = quality == MapTextureQuality.Enhanced;
+            var isEnhanced = quality >= MapTextureQuality.Enhanced;
+            var isHero = quality == MapTextureQuality.Hero;
 
             for (var index = 0; index < pixels.Length; index++)
             {
@@ -33,6 +34,11 @@ namespace BastionUA.UI
             if (isEnhanced)
             {
                 edgeSoftness *= MapUiConstants.MapV2CoastGlowMultiplier;
+            }
+
+            if (isHero)
+            {
+                edgeSoftness *= MapUiConstants.MapV3CoastGlowMultiplier;
             }
 
             for (var y = 0; y < height; y++)
@@ -58,6 +64,11 @@ namespace BastionUA.UI
                         fillColor = ApplyRegionTintHint(fillColor, normalizedX, normalizedY);
                         fillColor = ApplyCrimeaZoneTint(fillColor, normalizedX, normalizedY);
                         fillColor = ApplyRadialHighlight(fillColor, normalizedX, normalizedY);
+                    }
+
+                    if (isHero)
+                    {
+                        fillColor = ApplyCityGlowHint(fillColor, normalizedX, normalizedY);
                     }
 
                     var edgeDistance = GetDistanceToPolygonEdge(polygon, point);
@@ -194,6 +205,30 @@ namespace BastionUA.UI
                 Mathf.Clamp01(baseColor.g + highlight),
                 Mathf.Clamp01(baseColor.b + highlight),
                 baseColor.a);
+        }
+
+        private static Color ApplyCityGlowHint(Color baseColor, float normalizedX, float normalizedY)
+        {
+            var pixel = new Vector2(normalizedX, normalizedY);
+            var glowStrength = 0f;
+
+            for (var index = 0; index < RegionTintLayouts.Length; index++)
+            {
+                var layout = RegionTintLayouts[index];
+                var cityPoint = new Vector2(layout.NormalizedX, layout.NormalizedY);
+                var distance = Vector2.Distance(pixel, cityPoint);
+                var influence = Mathf.InverseLerp(MapUiConstants.MapV3CityGlowRadius, 0f, distance);
+                glowStrength = Mathf.Max(glowStrength, influence);
+            }
+
+            if (glowStrength <= 0f)
+            {
+                return baseColor;
+            }
+
+            var glowColor = GameVisualPalette.MapCityGlow;
+            var blend = glowStrength * MapUiConstants.MapV3CityGlowStrength;
+            return Color.Lerp(baseColor, glowColor, blend);
         }
 
         private static Vector2[] BuildPixelPolygon(Vector2[] normalizedPoints, int width, int height)

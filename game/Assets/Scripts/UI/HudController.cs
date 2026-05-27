@@ -79,7 +79,7 @@ namespace BastionUA.UI
 
             EnsureEventSystem();
 
-            CreateCanvasBackground(canvasObject.transform);
+            UiBrandShellFactory.BuildCanvasAtmosphere(canvasObject.transform);
 
             var topBar = CreatePanel(
                 canvasObject.transform,
@@ -89,17 +89,18 @@ namespace BastionUA.UI
                 new Vector2(0f, -GameUiConstants.TopBarHeight),
                 Vector2.zero,
                 GameVisualPalette.TopBar);
-            CreateFlagStripe(topBar.transform, "TopBarStripe");
-            CreateHudStatIcon(topBar.transform, "AmmoIcon", new Vector2(0.015f, 0.5f), UiIconKind.Ammo);
-            _ammoText = CreateHudStatText(topBar.transform, "AmmoText", new Vector2(0.039f, 0.5f));
-            _prestigeText = CreateHudStatText(topBar.transform, "PrestigeText", new Vector2(0.22f, 0.5f));
-            CreateHudStatIcon(topBar.transform, "MoraleIcon", new Vector2(0.36f, 0.5f), UiIconKind.Morale);
-            _moraleText = CreateHudStatText(topBar.transform, "MoraleText", new Vector2(0.384f, 0.5f));
-            CreateHudStatIcon(topBar.transform, "BattleIcon", new Vector2(0.50f, 0.5f), UiIconKind.Battle);
+            UiBrandShellFactory.ApplyTopBarBrand(topBar.transform);
+            UiBrandShellFactory.ApplyHudCorners(topBar.transform);
+            CreateHudStatIcon(topBar.transform, "AmmoIcon", new Vector2(GameUiConstants.HudStatAnchorAmmoIcon, 0.5f), UiIconKind.Ammo);
+            _ammoText = CreateHudStatText(topBar.transform, "AmmoText", new Vector2(GameUiConstants.HudStatAnchorAmmoText, 0.5f));
+            _prestigeText = CreateHudStatText(topBar.transform, "PrestigeText", new Vector2(GameUiConstants.HudStatAnchorPrestige, 0.5f));
+            CreateHudStatIcon(topBar.transform, "MoraleIcon", new Vector2(GameUiConstants.HudStatAnchorMoraleIcon, 0.5f), UiIconKind.Morale);
+            _moraleText = CreateHudStatText(topBar.transform, "MoraleText", new Vector2(GameUiConstants.HudStatAnchorMoraleText, 0.5f));
+            CreateHudStatIcon(topBar.transform, "BattleIcon", new Vector2(GameUiConstants.HudStatAnchorBattleIcon, 0.5f), UiIconKind.Battle);
             _selectedRegionText = CreateHudStatText(
                 topBar.transform,
                 "SelectedText",
-                new Vector2(0.58f, 0.5f),
+                new Vector2(GameUiConstants.HudStatAnchorSelected, 0.5f),
                 GameUiConstants.SelectedStatTextWidth);
             CreateFramedActionButton(
                 topBar.transform,
@@ -122,6 +123,7 @@ namespace BastionUA.UI
                 new Vector2(GameUiConstants.SidePanelWidth, 0f),
                 new Vector2(0f, GameUiConstants.BottomBarHeight),
                 GameVisualPalette.TopBar);
+            UiBrandShellFactory.ApplyHudCorners(bottomBar.transform);
 
             var tapButton = CreateFramedActionButton(
                 bottomBar.transform,
@@ -152,36 +154,7 @@ namespace BastionUA.UI
                 new Vector2(200f, 56f)).Root;
             _prestigeButtonObject.SetActive(false);
 
-            Debug.Log("[HudController] HUD visual A5 sidebar polish built.");
-        }
-
-        private static void CreateCanvasBackground(Transform canvasTransform)
-        {
-            var backgroundObject = new GameObject("CanvasBackground", typeof(RectTransform), typeof(Image));
-            backgroundObject.transform.SetParent(canvasTransform, false);
-            backgroundObject.transform.SetAsFirstSibling();
-
-            var rectTransform = backgroundObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
-            backgroundObject.GetComponent<Image>().color = GameVisualPalette.CanvasBackground;
-            backgroundObject.GetComponent<Image>().raycastTarget = false;
-        }
-
-        private static void CreateFlagStripe(Transform parent, string name)
-        {
-            var stripeObject = new GameObject(name, typeof(RectTransform), typeof(Image));
-            stripeObject.transform.SetParent(parent, false);
-            stripeObject.transform.SetAsFirstSibling();
-
-            var rectTransform = stripeObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0f, 0f);
-            rectTransform.anchorMax = new Vector2(1f, 0f);
-            rectTransform.pivot = new Vector2(0.5f, 0f);
-            rectTransform.sizeDelta = new Vector2(0f, GameUiConstants.AccentStripeHeight);
-            stripeObject.GetComponent<Image>().color = GameVisualPalette.AccentBlue;
+            Debug.Log("[HudController] HUD visual v2 brand shell built.");
         }
 
         private void BuildObjectiveBar(Transform canvasTransform)
@@ -194,6 +167,7 @@ namespace BastionUA.UI
                 new Vector2(0f, -GameUiConstants.HudTopInset),
                 new Vector2(0f, -GameUiConstants.TopBarHeight),
                 GameVisualPalette.ObjectiveBar);
+            UiBrandShellFactory.ApplyHudCorners(objectiveBar.transform);
 
             UiTextFactory.CreateObjectiveMarker(objectiveBar.transform);
             _objectiveText = UiTextFactory.Create(
@@ -217,6 +191,7 @@ namespace BastionUA.UI
                 new Vector2(0f, GameUiConstants.BottomBarHeight),
                 new Vector2(GameUiConstants.SidePanelWidth, -GameUiConstants.HudTopInset),
                 GameVisualPalette.SidePanel);
+            UiBrandShellFactory.ApplyHudCorners(legendPanel.transform);
 
             CreateSideAccent(legendPanel.transform);
             CreateTitle(legendPanel.transform, "LegendTitle", MapUiConstants.LegendTitle);
@@ -586,7 +561,7 @@ namespace BastionUA.UI
         private static Text ConfigureText(Text text, string content, int fontSize, TextAnchor alignment, Color color)
         {
             text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = UiFontLoader.GetBodyFont();
             text.fontSize = fontSize;
             text.color = color;
             text.alignment = alignment;

@@ -14,6 +14,8 @@ namespace BastionUA.UI
         Muted,
         Objective,
         Accent,
+        BrandTitle,
+        BrandSubtitle,
     }
 
     public static class UiTextFactory
@@ -93,7 +95,7 @@ namespace BastionUA.UI
         public static void ApplyStyle(Text text, UiTextStyle style, string content, TextAnchor alignment)
         {
             text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>(BuiltinFontResource);
+            text.font = UiFontLoader.ResolveForStyle(style);
             text.alignment = alignment;
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.verticalOverflow = VerticalWrapMode.Overflow;
@@ -135,6 +137,15 @@ namespace BastionUA.UI
                 case UiTextStyle.Accent:
                     text.fontSize = GameUiConstants.BaseFontSize;
                     text.color = GameVisualPalette.TextAccent;
+                    break;
+                case UiTextStyle.BrandTitle:
+                    text.fontSize = GameUiConstants.BrandTitleFontSize;
+                    text.color = GameVisualPalette.TextAccent;
+                    AddShadow(text);
+                    break;
+                case UiTextStyle.BrandSubtitle:
+                    text.fontSize = GameUiConstants.BrandSubtitleFontSize;
+                    text.color = GameVisualPalette.AccentBlueLight;
                     break;
             }
         }

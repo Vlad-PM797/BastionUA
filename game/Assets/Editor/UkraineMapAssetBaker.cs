@@ -11,6 +11,7 @@ namespace BastionUA.EditorTools
         private const string OutputFolder = "Assets/Resources/Art";
         private const string OutputFileName = "ukraine_map.png";
         private const string OutputV2FileName = "ukraine_map_v2.png";
+        private const string OutputV3FileName = "ukraine_map_v3.png";
 
         [MenuItem("BastionUA/Art/Bake Ukraine Map PNG")]
         public static void BakeUkraineMapPng()
@@ -22,6 +23,12 @@ namespace BastionUA.EditorTools
         public static void BakeUkraineMapV2Png()
         {
             BakeMapPng(OutputV2FileName, MapTextureQuality.Enhanced);
+        }
+
+        [MenuItem("BastionUA/Art/Bake Ukraine Map V3 PNG")]
+        public static void BakeUkraineMapV3Png()
+        {
+            BakeMapPng(OutputV3FileName, MapTextureQuality.Hero);
         }
 
         private static void BakeMapPng(string fileName, MapTextureQuality quality)

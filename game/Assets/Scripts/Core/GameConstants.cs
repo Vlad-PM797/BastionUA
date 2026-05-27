@@ -11,6 +11,7 @@ namespace BastionUA.Core
 
         public const string SaveFileName = "bastionua_save.json";
         public const string EventContentResourcePath = "Events/story_events";
+        public const string UiDisplayFontResourcePath = "Fonts/Exo2-Variable";
 
         public const int BattleBaseEnemyHp = 120;
         public const int BattleBaseEnemyDamage = 8;

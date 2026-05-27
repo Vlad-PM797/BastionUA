@@ -148,7 +148,7 @@ namespace BastionUA.UI
             Stretch(labelObject.GetComponent<RectTransform>());
             var labelText = labelObject.GetComponent<Text>();
             labelText.text = "+";
-            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            labelText.font = UiFontLoader.GetBodyFont();
             labelText.fontSize = GameUiConstants.TitleFontSize;
             labelText.color = GameVisualPalette.TextAccent;
             labelText.alignment = TextAnchor.MiddleCenter;

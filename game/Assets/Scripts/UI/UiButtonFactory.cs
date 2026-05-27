@@ -66,7 +66,7 @@ namespace BastionUA.UI
             StretchFullScreen(labelObject.GetComponent<RectTransform>());
             var labelText = labelObject.GetComponent<Text>();
             labelText.text = label;
-            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            labelText.font = UiFontLoader.GetBodyFont();
             labelText.fontSize = GameUiConstants.BaseFontSize;
             labelText.color = labelColor;
             labelText.alignment = TextAnchor.MiddleCenter;
@@ -118,7 +118,7 @@ namespace BastionUA.UI
             StretchFullScreen(labelObject.GetComponent<RectTransform>());
             var labelText = labelObject.GetComponent<Text>();
             labelText.text = label;
-            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            labelText.font = UiFontLoader.GetBodyFont();
             labelText.fontSize = GameUiConstants.CompactFontSize;
             labelText.color = GameVisualPalette.TextPrimary;
             labelText.alignment = TextAnchor.MiddleCenter;

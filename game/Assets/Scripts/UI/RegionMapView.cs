@@ -66,6 +66,7 @@ namespace BastionUA.UI
                 GameVisualPalette.SidePanel);
 
             CreateTitle(mapPanel.transform, "MapTitle", MapUiConstants.MapPanelTitle);
+            UiBrandShellFactory.ApplyHudCorners(mapPanel.transform);
 
             var frameObject = new GameObject("MapFrame", typeof(RectTransform), typeof(Image));
             frameObject.transform.SetParent(mapPanel.transform, false);
@@ -115,6 +116,9 @@ namespace BastionUA.UI
 
         private void BuildMarker(Transform mapRoot, MapRegionLayout layout)
         {
+            var circleSprite = UiProceduralSpriteFactory.GetCircleFilledSprite();
+            var ringSprite = UiProceduralSpriteFactory.GetCircleRingSprite();
+
             var markerObject = new GameObject($"Marker_{layout.RegionId}", typeof(RectTransform), typeof(Image), typeof(Button));
             markerObject.transform.SetParent(mapRoot, false);
 
@@ -125,7 +129,9 @@ namespace BastionUA.UI
             rectTransform.sizeDelta = new Vector2(MapUiConstants.MapMarkerSize, MapUiConstants.MapMarkerSize);
 
             var buttonImage = markerObject.GetComponent<Image>();
-            buttonImage.color = GameVisualPalette.ButtonNeutralBorder;
+            buttonImage.sprite = circleSprite;
+            buttonImage.color = new Color(0f, 0f, 0f, 0.35f);
+            buttonImage.preserveAspect = true;
 
             var button = markerObject.GetComponent<Button>();
             var regionId = layout.RegionId;
@@ -134,33 +140,56 @@ namespace BastionUA.UI
             var ringObject = new GameObject("StatusRing", typeof(RectTransform), typeof(Image));
             ringObject.transform.SetParent(markerObject.transform, false);
             var ringRect = ringObject.GetComponent<RectTransform>();
-            StretchFullScreen(ringRect, -4f);
+            StretchFullScreen(ringRect, -2f);
             var ringImage = ringObject.GetComponent<Image>();
+            ringImage.sprite = ringSprite;
             ringImage.color = GameVisualPalette.StatusDanger;
+            ringImage.preserveAspect = true;
+            ringImage.raycastTarget = false;
+            var occupiedPulse = ringObject.AddComponent<UiOccupiedPulse>();
+            occupiedPulse.Bind(ringImage);
 
             var coreObject = new GameObject("Core", typeof(RectTransform), typeof(Image));
             coreObject.transform.SetParent(markerObject.transform, false);
             var coreRect = coreObject.GetComponent<RectTransform>();
             StretchFullScreen(coreRect, -MapUiConstants.MapMarkerRingThickness);
-            coreObject.GetComponent<Image>().color = GameVisualPalette.MapMarkerCore;
+            var coreImage = coreObject.GetComponent<Image>();
+            coreImage.sprite = circleSprite;
+            coreImage.color = GameVisualPalette.MapMarkerCore;
+            coreImage.preserveAspect = true;
+            coreImage.raycastTarget = false;
 
             var selectionObject = new GameObject("SelectionRing", typeof(RectTransform), typeof(Image));
             selectionObject.transform.SetParent(markerObject.transform, false);
             var selectionRect = selectionObject.GetComponent<RectTransform>();
-            StretchFullScreen(selectionRect, -MapUiConstants.MapMarkerRingThickness * 2.4f);
-            selectionObject.GetComponent<Image>().color = GameVisualPalette.MapSelectionRing;
+            StretchFullScreen(selectionRect, -MapUiConstants.MapMarkerRingThickness * 1.8f);
+            var selectionImage = selectionObject.GetComponent<Image>();
+            selectionImage.sprite = ringSprite;
+            selectionImage.color = GameVisualPalette.MapSelectionRing;
+            selectionImage.preserveAspect = true;
+            selectionImage.raycastTarget = false;
             selectionObject.SetActive(false);
             var selectionPulse = selectionObject.AddComponent<UiSelectionPulse>();
-            selectionPulse.Bind(selectionObject.GetComponent<Image>());
+            selectionPulse.Bind(selectionImage);
+
+            var labelRoot = new GameObject("LabelRoot", typeof(RectTransform));
+            labelRoot.transform.SetParent(markerObject.transform, false);
+            var labelRootRect = labelRoot.GetComponent<RectTransform>();
+            labelRootRect.anchorMin = new Vector2(0.5f, 0f);
+            labelRootRect.anchorMax = new Vector2(0.5f, 0f);
+            labelRootRect.pivot = new Vector2(0.5f, 1f);
+            labelRootRect.anchoredPosition = new Vector2(0f, -MapUiConstants.MapMarkerSize * 0.52f);
+            labelRootRect.sizeDelta = new Vector2(MapUiConstants.MapMarkerLabelBadgeWidth, MapUiConstants.MapMarkerLabelBadgeHeight);
+
+            var badgeObject = new GameObject("LabelBadge", typeof(RectTransform), typeof(Image));
+            badgeObject.transform.SetParent(labelRoot.transform, false);
+            StretchFullScreen(badgeObject.GetComponent<RectTransform>(), 0f);
+            badgeObject.GetComponent<Image>().color = GameVisualPalette.SidebarInsetPanel;
+            badgeObject.GetComponent<Image>().raycastTarget = false;
 
             var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
-            labelObject.transform.SetParent(markerObject.transform, false);
-            var labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = new Vector2(0.5f, 0f);
-            labelRect.anchorMax = new Vector2(0.5f, 0f);
-            labelRect.pivot = new Vector2(0.5f, 1f);
-            labelRect.anchoredPosition = new Vector2(0f, -MapUiConstants.MapMarkerSize * 0.58f);
-            labelRect.sizeDelta = new Vector2(160f, 28f);
+            labelObject.transform.SetParent(labelRoot.transform, false);
+            StretchFullScreen(labelObject.GetComponent<RectTransform>(), 2f);
 
             var labelText = labelObject.GetComponent<Text>();
             var definition = RegionCatalog.GetById(layout.RegionId);
@@ -168,11 +197,16 @@ namespace BastionUA.UI
                 labelText,
                 definition != null ? definition.DisplayName : layout.RegionId,
                 MapUiConstants.MapLabelFontSize,
-                TextAnchor.UpperCenter,
+                TextAnchor.MiddleCenter,
                 GameVisualPalette.TextPrimary);
             UiTextFactory.AddDropShadow(labelText);
 
-            _markers[layout.RegionId] = new MapMarkerUi(buttonImage, ringImage, selectionObject, labelText);
+            _markers[layout.RegionId] = new MapMarkerUi(
+                buttonImage,
+                ringImage,
+                selectionObject,
+                labelText,
+                occupiedPulse);
         }
 
         private static void CreateConnection(Transform mapRoot, MapRegionLayout from, MapRegionLayout to)
@@ -253,7 +287,7 @@ namespace BastionUA.UI
         private static void ConfigureText(Text text, string content, int fontSize, TextAnchor alignment, Color color)
         {
             text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = UiFontLoader.GetBodyFont();
             text.fontSize = fontSize;
             text.color = color;
             text.alignment = alignment;
@@ -267,22 +301,32 @@ namespace BastionUA.UI
             private readonly Image _statusRing;
             private readonly GameObject _selectionRing;
             private readonly Text _label;
+            private readonly UiOccupiedPulse _occupiedPulse;
 
-            public MapMarkerUi(Image buttonImage, Image statusRing, GameObject selectionRing, Text label)
+            public MapMarkerUi(
+                Image buttonImage,
+                Image statusRing,
+                GameObject selectionRing,
+                Text label,
+                UiOccupiedPulse occupiedPulse)
             {
                 _buttonImage = buttonImage;
                 _statusRing = statusRing;
                 _selectionRing = selectionRing;
                 _label = label;
+                _occupiedPulse = occupiedPulse;
             }
 
             public void Update(RegionState region, bool isSelected)
             {
                 _label.text = region.DisplayName;
-                _statusRing.color = GetStatusColor(region.Status);
+                var statusColor = GetStatusColor(region.Status);
+                _statusRing.color = statusColor;
+                _occupiedPulse.RefreshBaseColor(statusColor);
+                _occupiedPulse.SetActivePulse(region.Status == RegionStatus.Occupied);
                 _buttonImage.color = isSelected
-                    ? GameVisualPalette.ButtonSelectedBorder
-                    : GameVisualPalette.ButtonNeutralBorder;
+                    ? new Color(GameVisualPalette.ButtonSelectedBorder.r, GameVisualPalette.ButtonSelectedBorder.g, GameVisualPalette.ButtonSelectedBorder.b, 0.55f)
+                    : new Color(0f, 0f, 0f, 0.35f);
                 _selectionRing.SetActive(isSelected);
             }
 

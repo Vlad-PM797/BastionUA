@@ -31,6 +31,12 @@ namespace BastionUA.UI
 
         public static Sprite LoadMapSprite()
         {
+            var v3Sprite = TryLoadResourceSprite(GameVisualPalette.UkraineMapV3ResourcePath);
+            if (v3Sprite != null)
+            {
+                return v3Sprite;
+            }
+
             var v2Sprite = TryLoadResourceSprite(GameVisualPalette.UkraineMapV2ResourcePath);
             if (v2Sprite != null)
             {
@@ -45,7 +51,7 @@ namespace BastionUA.UI
 
             var width = Mathf.RoundToInt(MapUiConstants.MapLandmassWidth * MapUiConstants.MapSilhouetteTextureScale);
             var height = Mathf.RoundToInt(MapUiConstants.MapLandmassHeight * MapUiConstants.MapSilhouetteTextureScale);
-            return UkraineMapRasterizer.CreateMapSprite(width, height, MapTextureQuality.Enhanced);
+            return UkraineMapRasterizer.CreateMapSprite(width, height, MapTextureQuality.Hero);
         }
 
         private static Sprite TryLoadResourceSprite(string resourcePath)

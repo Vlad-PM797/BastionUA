@@ -6,11 +6,15 @@ namespace BastionUA.Core
     {
         public const string UkraineMapResourcePath = "Art/ukraine_map";
         public const string UkraineMapV2ResourcePath = "Art/ukraine_map_v2";
+        public const string UkraineMapV3ResourcePath = "Art/ukraine_map_v3";
         public const string UiIconAmmoResourcePath = "Art/ui/icon_ammo";
         public const string UiIconMoraleResourcePath = "Art/ui/icon_morale";
         public const string UiIconBattleResourcePath = "Art/ui/icon_battle";
 
         public static readonly Color CanvasBackground = Hex("#0B1118");
+        public static readonly Color CanvasBackgroundTop = Hex("#142436");
+        public static readonly Color CanvasBackgroundBottom = Hex("#05080E");
+        public static readonly Color AtmosphereBlueGlow = Hex("#1A4A7A", 0.22f);
         public static readonly Color TopBar = Hex("#121C28", 0.96f);
         public static readonly Color ObjectiveBar = Hex("#0F1722", 0.92f);
         public static readonly Color SidePanel = Hex("#101923", 0.94f);
@@ -50,6 +54,7 @@ namespace BastionUA.Core
         public static readonly Color MapConnection = Hex("#4A6885", 0.42f);
         public static readonly Color MapMarkerCore = Hex("#F8FBFF");
         public static readonly Color MapSelectionRing = Hex("#FFD700");
+        public static readonly Color MapCityGlow = Hex("#FFE08A", 0.95f);
 
         public static readonly Color EventOverlay = Hex("#05080E", 0.78f);
         public static readonly Color EventPanel = Hex("#0F1722", 0.98f);

@@ -44,6 +44,7 @@ namespace BastionUA.EditorTools
                 failures += VerifyChernihivEventFlow() ? 0 : 1;
                 failures += VerifyVisualPaletteAssets() ? 0 : 1;
                 failures += VerifyMapArtResource() ? 0 : 1;
+                failures += VerifyUiFontResource() ? 0 : 1;
                 failures += VerifyPrestigeFlow() ? 0 : 1;
             }
             catch (Exception exception)
@@ -776,6 +777,7 @@ namespace BastionUA.EditorTools
         {
             var mapPath = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map.png");
             var mapV2Path = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map_v2.png");
+            var mapV3Path = Path.Combine(Application.dataPath, "Resources/Art/ukraine_map_v3.png");
             if (!File.Exists(mapPath))
             {
                 Debug.LogWarning("[UnityVerification] ukraine_map.png missing; runtime rasterizer fallback will be used.");
@@ -794,12 +796,41 @@ namespace BastionUA.EditorTools
                 Debug.Log("[UnityVerification] ukraine_map_v2.png asset present.");
             }
 
+            if (!File.Exists(mapV3Path))
+            {
+                Debug.LogWarning("[UnityVerification] ukraine_map_v3.png missing; loader falls back to v2/v1 or rasterizer.");
+            }
+            else
+            {
+                Debug.Log("[UnityVerification] ukraine_map_v3.png asset present.");
+            }
+
             var iconFolder = Path.Combine(Application.dataPath, "Resources/Art/ui");
             if (!Directory.Exists(iconFolder))
             {
                 Debug.LogWarning("[UnityVerification] UI icon folder missing; procedural icon fallback will be used.");
             }
 
+            return true;
+        }
+
+        private static bool VerifyUiFontResource()
+        {
+            var fontPath = Path.Combine(Application.dataPath, "Resources/Fonts/Exo2-Variable.ttf");
+            if (!File.Exists(fontPath))
+            {
+                Debug.LogWarning("[UnityVerification] Exo2-Variable.ttf missing; UI falls back to LegacyRuntime.");
+                return true;
+            }
+
+            var font = Resources.Load<Font>(GameConstants.UiDisplayFontResourcePath);
+            if (font == null)
+            {
+                Debug.LogError("[UnityVerification] Exo2 font failed to load from Resources.");
+                return false;
+            }
+
+            Debug.Log("[UnityVerification] UI Cyrillic font resource OK.");
             return true;
         }
 

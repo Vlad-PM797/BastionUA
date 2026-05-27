@@ -89,11 +89,13 @@ namespace BastionUA.UI
                 GameUiConstants.EventPanelWidth,
                 GameUiConstants.EventPanelHeight);
 
+            PopupUiFactory.CreateEventBanner(panelObject.transform, eventDefinition.EventId);
+
             PopupUiFactory.CreateTitle(
                 panelObject.transform,
                 "EventTitle",
                 eventDefinition.Title,
-                new Vector2(0f, -36f),
+                new Vector2(0f, GameUiConstants.EventTitleOffsetY),
                 new Vector2(680f, 48f),
                 GameVisualPalette.TextAccent);
 
@@ -101,8 +103,8 @@ namespace BastionUA.UI
                 panelObject.transform,
                 "EventDescription",
                 eventDefinition.Description,
-                new Vector2(0f, -118f),
-                new Vector2(680f, 140f));
+                new Vector2(0f, GameUiConstants.EventBodyOffsetY),
+                new Vector2(680f, 130f));
 
             if (eventDefinition.Choices == null || eventDefinition.Choices.Count == 0)
             {

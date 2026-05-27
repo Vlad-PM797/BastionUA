@@ -4,5 +4,6 @@ namespace BastionUA.UI
     {
         Standard,
         Enhanced,
+        Hero,
     }
 }

@@ -10,8 +10,10 @@ namespace BastionUA.Core
         public const string LegendDanger = "Danger — загроза";
         public const string LegendOccupied = "Occupied — окуповано";
 
-        public const float MapMarkerSize = 54f;
-        public const float MapMarkerRingThickness = 5f;
+        public const float MapMarkerSize = 58f;
+        public const float MapMarkerRingThickness = 6f;
+        public const float MapMarkerLabelBadgeWidth = 168f;
+        public const float MapMarkerLabelBadgeHeight = 24f;
         public const float MapConnectionThickness = 3f;
         public const float MapLandmassWidth = 820f;
         public const float MapLandmassHeight = 620f;
@@ -56,6 +58,11 @@ namespace BastionUA.Core
         public static readonly Vector2 MapV2CrimeaZoneCenter = new Vector2(0.62f, 0.11f);
         public static readonly Vector2 MapV2HighlightCenter = new Vector2(0.48f, 0.46f);
         public const float MapV2HighlightRadius = 0.42f;
+
+        public const float MapV3CoastGlowMultiplier = 2.15f;
+        public const float MapV3CityGlowRadius = 0.045f;
+        public const float MapV3CityGlowStrength = 0.42f;
+        public const int MapV3CityGlowRadiusPixels = 14;
     }
 
     public readonly struct MapRegionLayout

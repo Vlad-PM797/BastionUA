@@ -113,6 +113,37 @@ namespace BastionUA.UI
             return panelObject;
         }
 
+        public static void CreateEventBanner(Transform panelTransform, string eventId)
+        {
+            var bannerObject = new GameObject("EventBanner", typeof(RectTransform), typeof(Image));
+            bannerObject.transform.SetParent(panelTransform, false);
+            bannerObject.transform.SetSiblingIndex(1);
+
+            var rectTransform = bannerObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(1f, 1f);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+            rectTransform.anchoredPosition = new Vector2(0f, -GameUiConstants.PopupAccentStripeHeight);
+            rectTransform.sizeDelta = new Vector2(0f, GameUiConstants.EventBannerHeight);
+
+            var image = bannerObject.GetComponent<Image>();
+            image.sprite = EventBannerArtFactory.GetBannerSprite(eventId);
+            image.type = Image.Type.Simple;
+            image.preserveAspect = false;
+            image.color = Color.white;
+            image.raycastTarget = false;
+
+            var stripeObject = new GameObject("EventBannerAccent", typeof(RectTransform), typeof(Image));
+            stripeObject.transform.SetParent(bannerObject.transform, false);
+            var stripeRect = stripeObject.GetComponent<RectTransform>();
+            stripeRect.anchorMin = new Vector2(0f, 0f);
+            stripeRect.anchorMax = new Vector2(1f, 0f);
+            stripeRect.pivot = new Vector2(0.5f, 0f);
+            stripeRect.sizeDelta = new Vector2(0f, 3f);
+            stripeObject.GetComponent<Image>().color = GameVisualPalette.AccentYellow;
+            stripeObject.GetComponent<Image>().raycastTarget = false;
+        }
+
         public static Text CreateTitle(
             Transform parent,
             string name,
@@ -213,7 +244,7 @@ namespace BastionUA.UI
 
             var labelText = labelObject.GetComponent<Text>();
             labelText.text = label;
-            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            labelText.font = UiFontLoader.GetBodyFont();
             labelText.fontSize = GameUiConstants.BaseFontSize;
             labelText.color = labelColor;
             labelText.alignment = TextAnchor.MiddleCenter;
@@ -258,7 +289,7 @@ namespace BastionUA.UI
 
             var text = textObject.GetComponent<Text>();
             text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = addShadow ? UiFontLoader.ResolveForPopupTitle() : UiFontLoader.ResolveForPopupBody();
             text.fontSize = fontSize;
             text.color = color;
             text.alignment = alignment;

@@ -51,7 +51,10 @@ namespace BastionUA.Core
         public const float EventPopupDelaySeconds = 2.5f;
         public const float EventOverlayAlpha = 0.72f;
         public const float EventPanelWidth = 760f;
-        public const float EventPanelHeight = 420f;
+        public const float EventPanelHeight = 450f;
+        public const float EventBannerHeight = 88f;
+        public const float EventTitleOffsetY = -118f;
+        public const float EventBodyOffsetY = -200f;
         public const int EventTitleFontSize = 30;
         public const int EventBodyFontSize = 22;
         public const float PopupBorderExpand = 2f;
@@ -128,6 +131,37 @@ namespace BastionUA.Core
         public const float SidebarResetButtonWidth = 236f;
         public const float SidebarResetButtonHeight = 34f;
         public const float SidebarPurchaseButtonWidth = 48f;
+
+        public const string BrandTitle = "BASTION UA";
+        public const string BrandSubtitle = "DEFENSE COMMAND";
+        public const float BrandLockupLeftPadding = 18f;
+        public const float BrandLockupWidth = 190f;
+        public const float BrandFlagStripeHeight = 2f;
+        public const float BrandFlagBlueStripeHeight = 3f;
+        public const int BrandTitleFontSize = 24;
+        public const int BrandSubtitleFontSize = 11;
+
+        public const float AtmospherePulseSpeed = 0.35f;
+        public const float AtmosphereGlowMinAlpha = 0.12f;
+        public const float AtmosphereGlowMaxAlpha = 0.28f;
+        public const int CanvasGradientTextureWidth = 4;
+        public const int CanvasGradientTextureHeight = 256;
+        public const int ProceduralCircleTextureSize = 64;
+        public const int ProceduralCornerTextureSize = 64;
+        public const int HudCornerLinePixels = 3;
+        public const float HudCornerDisplaySize = 28f;
+
+        public const float MapMarkerOccupiedPulseSpeed = 2.6f;
+        public const float MapMarkerOccupiedPulseMinAlpha = 0.55f;
+        public const float MapMarkerOccupiedPulseMaxAlpha = 1f;
+
+        public const float HudStatAnchorAmmoIcon = 0.145f;
+        public const float HudStatAnchorAmmoText = 0.169f;
+        public const float HudStatAnchorPrestige = 0.31f;
+        public const float HudStatAnchorMoraleIcon = 0.445f;
+        public const float HudStatAnchorMoraleText = 0.469f;
+        public const float HudStatAnchorBattleIcon = 0.585f;
+        public const float HudStatAnchorSelected = 0.665f;
 
         public static float SidebarContentHeight =>
             ReferenceHeight - BottomBarHeight - HudTopInset;
